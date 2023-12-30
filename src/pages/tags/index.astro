@@ -1,0 +1,95 @@
+---
+import Topbar from "../../components/Topbar/Topbar.tsx";
+import Footer from "../../components/Footer/Footer.tsx";
+import RecentCards from "../../components/Homepage/RecentCards.tsx";
+import MetadataHead from "../../components/MetadataHead/MetadataHead.astro";
+import {
+  SITE_TITLE_SEPARATOR,
+  SITE_TITLE,
+  SITE_TITLE_DEVANAGRI,
+  Tags,
+} from "../../consts";
+import { getCollection } from "astro:content";
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const ogSiteName = `${SITE_TITLE_DEVANAGRI} ${SITE_TITLE_SEPARATOR} ${SITE_TITLE}`;
+const pageName = `Tags ${SITE_TITLE_SEPARATOR} ${ogSiteName}`;
+
+const pages = (await getCollection("page")).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const checkItem = (postTags: any[], tagSection: any): boolean => {
+  for (let postTag of postTags) {
+    if (Tags.includes(postTag) && postTag == tagSection) return true;
+  }
+  return false;
+};
+
+const ldSchema = {
+  "@context": "https://schema.org",
+  "@type": "Series",
+  publisher: {
+    "@type": "Organization",
+    name: ogSiteName,
+    url: "https://brahmadev.in/",
+    logo: {
+      "@type": "ImageObject",
+      url: "https://brahmadev.in/assets/images/brahma-icon.png",
+      width: 60,
+      height: 60,
+    },
+  },
+  url: Astro.url,
+  name: pageName,
+  mainEntityOfPage: Astro.url,
+};
+---
+
+<html lang="en">
+  <head>
+    <MetadataHead />
+
+    <link rel="canonical" href={canonicalURL} />
+    <title>{pageName}</title>
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url} />
+    <meta property="og:title" content={pageName} />
+    <meta property="og:site_name" content={ogSiteName} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(ldSchema)}>
+    </script>
+    
+  </head>
+
+  <body
+    class="bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))]
+  from-gray-700 via-gray-900 to-black min-h-screen h-full w-full"
+  >
+    <Topbar client:only="react" />
+
+    <div class="mt-24 mx-4">
+      {
+        Tags.map((tag) => 
+        {
+            const myPages = pages.filter((post: any) =>
+                checkItem(post.data.tags, tag)
+            )
+            if (myPages.length == 0) return null
+            else return  (
+                <div class="container mx-auto mb-16">
+                    <h2 class="
+                    text-white text-2xl font-bold ml-2 capitalize mb-4 underline underline-offset-8
+                    ">{tag}</h2>
+                    <RecentCards pages={myPages} />
+                  <!--  <hr class="border-t mt-6 w-1/2 mx-auto border-gray-500"/> --> 
+                </div>
+            )
+        })
+      }
+    </div>
+
+
+    <div style="margin-top: 12.5rem;"><Footer client:only="react" /></div>
+  </body>
+</html>

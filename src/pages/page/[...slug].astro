@@ -1,0 +1,146 @@
+---
+import { type CollectionEntry, getCollection } from "astro:content";
+import Topbar from "../../components/Topbar/Topbar.tsx";
+import Footer from "../../components/Footer/Footer.tsx";
+
+import {
+  SITE_TITLE_SEPARATOR,
+  SITE_TITLE,
+  SITE_TITLE_DEVANAGRI,
+  SITE_DESCRIPTION,
+  SITE_DESCRIPTION_DEVANAGRI,
+  DEFAULT_ARTICLE_IMAGE,
+} from "../../consts";
+import MetadataHead from "../../components/MetadataHead/MetadataHead.astro";
+import ArticleBody from "../../components/Article/ArticleBody";
+
+export async function getStaticPaths() {
+  // IMP NOTE: this genrates the dynamic paths for the current route
+  const pages = await getCollection("page");
+  return pages.map((post) => ({
+    params: { slug: post.slug },
+    props: post,
+  }));
+}
+
+type Props = CollectionEntry<"page">;
+
+const post = Astro.props;
+
+const { Content } = await post.render();
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+
+const { titleDevanagri, titleEnglish, description, heroImage, pubDate, tags } =
+  post.data;
+
+const ogSiteName = `${SITE_TITLE_DEVANAGRI} ${SITE_TITLE_SEPARATOR} ${SITE_TITLE}`;
+
+const postTitleEnglish = `${titleEnglish} ${SITE_TITLE_SEPARATOR} ${SITE_TITLE}`;
+const postTitleDevanagri = `${titleDevanagri} ${SITE_TITLE_SEPARATOR} ${SITE_TITLE_DEVANAGRI}`;
+
+const postTitleCombined = `${titleDevanagri} ${SITE_TITLE_SEPARATOR} ${titleEnglish} ${SITE_TITLE_SEPARATOR} ${SITE_TITLE_DEVANAGRI} ${SITE_TITLE_SEPARATOR} ${SITE_TITLE}`;
+const postDesciptionCombined = description;
+
+const finalHeroImage = new URL(
+  heroImage ? heroImage : DEFAULT_ARTICLE_IMAGE,
+  Astro.url
+);
+
+const ldSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  publisher: {
+    "@type": "Organization",
+    name: ogSiteName,
+    url: "https://brahmadev.in/",
+    logo: {
+      "@type": "ImageObject",
+      url: "https://brahmadev.in/assets/images/brahma-icon.png",
+      width: 60,
+      height: 60,
+    },
+  },
+  headline: postTitleCombined,
+  url: Astro.url,
+  datePublished: pubDate,
+  keywords: tags?.length ? tags.join(", ") : "",
+  description: postDesciptionCombined,
+  mainEntityOfPage: Astro.url,
+};
+---
+
+<html lang="en">
+  <head>
+    <MetadataHead />
+
+    <link rel="canonical" href={canonicalURL} />
+    <title>{postTitleCombined}</title>
+
+    <meta name="title" lang="en" content={postTitleEnglish} />
+    <meta name="description" lang="en" content={description} />
+
+    <meta name="title" lang="hi" content={postTitleDevanagri} />
+    <meta name="description" lang="hi" content={description} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url} />
+    <meta property="og:title" content={postTitleCombined} />
+    <meta property="og:site_name" content={ogSiteName} />
+    <meta property="og:description" content={postDesciptionCombined} />
+
+    <meta property="og:site_name:locale" content="en_IN" />
+    <meta property="og:site_name:locale:alternate" content="hi_IN" />
+    <meta property="og:site_name:locale:alternate" content="hi" />
+    <meta property="og:site_name:locale:alternate" content="en" />
+
+    <meta property="og:locale" content="en_IN" />
+    <meta property="og:locale:alternate" content="hi_IN" />
+    <meta property="og:locale:alternate" content="hi" />
+    <meta property="og:locale:alternate" content="en" />
+
+    <meta property="og:image" content={finalHeroImage} />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={Astro.url} />
+    <meta property="twitter:title" content={postTitleCombined} />
+    <meta property="twitter:description" content={postDesciptionCombined} />
+    <meta property="twitter:image" content={finalHeroImage} />
+    <meta property="twitter:site" content={"https://brahmadev.in"} />
+
+    <style>
+      .m_title {
+        display: inline-block;
+      }
+      .m_title:first-letter {
+        text-transform: uppercase;
+      }
+    </style>
+    <script type="application/ld+json" set:html={JSON.stringify(ldSchema)}>
+    </script>
+    
+  </head>
+
+  <body
+    class="w-full bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))]
+  from-gray-700 via-gray-900 to-black h-full"
+  >
+    <Topbar client:only="react" />
+
+    <div
+      class="px-1 md:px-12 lg:w-3/4 mx-auto py-6 mt-16 leading-normal w-full"
+      style="line-height: 2.2rem; line-break: loose;"
+    >
+      <ArticleBody
+        data={post.data}
+        availableLanguages={post.data.availableLanguages || []}
+        client:only="react"
+      >
+        <Content />
+      </ArticleBody>
+    </div>
+    <Footer client:only="react" />
+  </body>
+</html>
