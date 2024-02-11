@@ -12,7 +12,7 @@ import {
   DEFAULT_ARTICLE_IMAGE,
 } from "../../utils/consts.ts";
 import MetadataHead from "../../components/MetadataHead.astro";
-import ArticleBody from "../../components/ArticleBody.tsx";
+import ArticleBody from "../../components/ArticleBody.astro";
 
 export async function getStaticPaths() {
   // IMP NOTE: this genrates the dynamic paths for the current route
@@ -136,10 +136,9 @@ const ldSchema = {
       <ArticleBody
         data={post.data}
         availableLanguages={post.data.availableLanguages || []}
-        client:only="react"
-      >
-        <Content />
-      </ArticleBody>
+        Content={Content}
+      />
+
     </div>
     <Footer />
   </body>

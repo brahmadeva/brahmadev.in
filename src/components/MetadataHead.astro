@@ -5,14 +5,14 @@
 <link rel="preload" as="image" href="/assets/images/brahma-icon.png" />
 <link rel="icon" type="image/png" href="/assets/images/brahma-icon.png" />
 <link
-  rel="preload"
+  rel="stylesheet preload prefetch" 
   href="/fonts/atkinson-regular.woff"
   as="font"
   type="font/woff"
   crossorigin
 />
 <link
-  rel="preload"
+  rel="stylesheet preload prefetch"
   href="/fonts/atkinson-bold.woff"
   as="font"
   type="font/woff"
@@ -25,6 +25,7 @@
   declare global {
     interface Window {
       dataLayer: any;
+      selectedLang: string;
     }
   }
 

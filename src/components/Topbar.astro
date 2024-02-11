@@ -1,11 +1,17 @@
 ---
 import { SITE_TITLE, Tags } from "../utils/consts.ts";
-
-function onSearchPressed() {
-  console.log("Search pressed");
-}
 ---
 
+<script>
+  // button with id searchButton
+  const buttons = document.querySelectorAll("button.searchButton");
+
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      alert("Button was clicked!");
+    });
+  });
+</script>
 <header
   class="z-20 w-full flex place-items-center fixed top-0 backdrop-blur-sm bg-gray/10"
 >
@@ -39,7 +45,7 @@ function onSearchPressed() {
         </ul>
 
         <div class="hidden xl:flex items-center space-x-5">
-          <button onclick="onSearchPressed()">
+          <button class="searchButton">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 50 50"
@@ -70,8 +76,7 @@ function onSearchPressed() {
       </div>
 
       <button
-        class="hover:text-gray-200 flex mr-6 items-center xl:hidden"
-        onclick="onSearchPressed()"
+        class="hover:text-gray-200 flex mr-6 items-center xl:hidden searchButton"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
