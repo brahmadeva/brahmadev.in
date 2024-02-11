@@ -102,6 +102,7 @@ const { Content, data, availableLanguages } = Astro.props;
               <button
                 title={`Show ${item.label} Translation`}
                 id={`lang-${item.label}`}
+                aria-label={`Show ${item.label} Translation`}
                 class={`font-default text-sm relative border border-gray-300 text-gray-700 rounded-full font-bold h-10 w-10`}
               >
                 {item.symbol}{" "}
@@ -118,39 +119,6 @@ const { Content, data, availableLanguages } = Astro.props;
         </div>
       )
     }
-
-    <!-- {
-      availableLanguages.length > 0 ? (
-        <div class="border w-fit px-20 border-purple-400 rounded-lg pb-6 pt-1 my-2 mx-auto text-center">
-          <h3 class="font-semibold w-full">Select Language</h3>
-          <div class="flex gap-6 pt-0 flex-row flex-wrap justify-center">
-            // {Languages.filter((item) =>
-            //   availableLanguages.includes(item.label)
-            // ).map((item, index) => (
-            //   <button
-           
-         
-            //     title={`Show ${item.label} Translation`}
-            //     class={`font-default text-sm relative border border-gray-300 text-gray-700 rounded-full font-bold h-10 w-10 ${
-            //       item.label == document.window.selectedLang
-            //         ? "text-purple-700 border-purple-500 drop-shadow bg-purple-100"
-            //         : ""
-            //     }`}
-            //   >
-            //     {item.symbol}{" "}
-            //     <span class="capitalize absolute text-[10px] -bottom-5 w-full text-center left-0 block">
-            //       {item.label}
-            //     </span>
-            //   </button>
-            // ))}
-          </div>
-        </div>
-      ) : (
-        <div class="w-1/2 mx-auto">
-          <hr class="border-t border-slate-800/40 mx-3 mb-8" />
-        </div>
-      )
-    } -->
 
     <div class="px-4 sm:px-8 md:px-16 lg:px-18 mt-8 antialised">
       <Content />

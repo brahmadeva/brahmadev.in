@@ -8,7 +8,7 @@ import { SITE_TITLE, Tags } from "../utils/consts.ts";
 
   buttons.forEach((button) => {
     button.addEventListener("click", () => {
-      alert("Button was clicked!");
+      alert("Search function coming soon..");
     });
   });
 </script>
@@ -26,6 +26,7 @@ import { SITE_TITLE, Tags } from "../utils/consts.ts";
           <img
             src="/assets/images/brahma-icon.png"
             class="w-10 h-10 p-0.5 border rounded-full mr-2 align-middle items-center"
+            alt="Brahma Icon"
           />
           {SITE_TITLE}
         </a>
@@ -45,7 +46,7 @@ import { SITE_TITLE, Tags } from "../utils/consts.ts";
         </ul>
 
         <div class="hidden xl:flex items-center space-x-5">
-          <button class="searchButton">
+          <button class="searchButton" aria-label="Search">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 50 50"
@@ -76,6 +77,7 @@ import { SITE_TITLE, Tags } from "../utils/consts.ts";
       </div>
 
       <button
+        aria-label="Search"
         class="hover:text-gray-200 flex mr-6 items-center xl:hidden searchButton"
       >
         <svg
