@@ -7,7 +7,7 @@ import {
   SITE_DESCRIPTION,
   SITE_TITLE_SEPARATOR,
   DEFAULT_ARTICLE_IMAGE,
-} from "../consts";
+} from "../utils/consts";
 
 export async function GET(context) {
   const posts = await getCollection("page");

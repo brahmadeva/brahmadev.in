@@ -1,0 +1,13 @@
+.translation {
+  margin-top: 0.5rem;
+  line-height: 2rem;
+  margin-bottom: 2rem;
+}
+
+.sanskrit-shlok {
+  @apply font-semibold mb-4 leading-8;
+  /* font-weight: 500; */
+  /* font-size: medium; */
+  /* line-height: 1.8rem;
+  margin-bottom: 1rem; */
+}

@@ -1,14 +1,14 @@
 ---
-import Topbar from "../../components/Topbar/Topbar.tsx";
-import Footer from "../../components/Footer/Footer.tsx";
-import RecentCards from "../../components/Homepage/RecentCards.tsx";
-import MetadataHead from "../../components/MetadataHead/MetadataHead.astro";
+import Topbar from "../../components/Topbar.astro";
+import Footer from "../../components/Footer.astro";
+import RecentCards from "../../components/RecentCards.astro";
+import MetadataHead from "../../components/MetadataHead.astro";
 import {
   SITE_TITLE_SEPARATOR,
   SITE_TITLE,
   SITE_TITLE_DEVANAGRI,
   Tags,
-} from "../../consts";
+} from "../../utils/consts.ts";
 import { getCollection } from "astro:content";
 
 // this genraes
@@ -78,9 +78,9 @@ const ldSchema = {
 
   <body
     class="bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))]
-  from-gray-700 via-gray-900 to-black min-h-screen h-full w-full"
+  from-gray-700 via-gray-900 to-black min-h-screen w-full"
   >
-    <Topbar client:only="react" />
+    <Topbar />
 
     <div class="mt-24 mx-4">
       <div class="container mx-auto mb-16">
@@ -120,6 +120,6 @@ const ldSchema = {
       </h1>
     </div> -->
 
-    <div style="margin-top: 12.5rem;"><Footer client:only="react" /></div>
+    <div style="margin-top: 12.5rem;"><Footer /></div>
   </body>
 </html>

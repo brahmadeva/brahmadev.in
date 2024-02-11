@@ -1,0 +1,15 @@
+- Add mobile navbar button
+- video resize, dynamic and onload
+- remove react dependancyand move to pure js
+- Remove react depenacy and implement logic in native js, this will make the page render at compile time | so it will add SEO! which is not currently there
+- search implemetation? possibly using site: google?
+- add still image before loading video
+- fix bg video as not imp video page
+- fix video & cta img size resolution on mobile
+- optimize cta image, video, preload it
+- new domains: gurubrahma.in, brahmaji.in
+- related post down in post
+- hamburger for phone
+- add ckeditor
+- download btn for pdf
+- post idea: add gayatri shapa vimpchan
