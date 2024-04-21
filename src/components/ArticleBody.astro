@@ -1,5 +1,5 @@
 ---
-import { Languages, Tags } from "../utils/consts.ts";
+import { Languages, Tags } from "../utils/consts";
 import "../styles/ArticleBody.css";
 
 const { Content, data, availableLanguages } = Astro.props;
@@ -29,6 +29,22 @@ const { Content, data, availableLanguages } = Astro.props;
       document
         .getElementById(firstLangId)
         .classList.add(...selectedClasses.split(" "));
+
+      document
+        .querySelectorAll(`.${availableLanguages[0]}-translation`)
+        .forEach((element) => {
+          element.style.display = "block";
+        });
+
+      const otherLanguages = availableLanguages.filter(
+        (item) => item != availableLanguages[0]
+      );
+
+      otherLanguages.forEach((lang) => {
+        document.querySelectorAll(`.${lang}-translation`).forEach((element) => {
+          element.style.display = "none";
+        });
+      });
     }
 
     langButtons.forEach((buttonId, languageId) => {
@@ -121,8 +137,9 @@ const { Content, data, availableLanguages } = Astro.props;
     }
 
     <div class="px-4 sm:px-8 md:px-16 lg:px-18 mt-8 antialised">
-      <Content />
-
+      <div class="text-xl">
+        <Content />
+      </div>
       <br />
 
       <div
@@ -135,7 +152,7 @@ const { Content, data, availableLanguages } = Astro.props;
           data.sourceName && (
             <>
               <span class="font-semibold antialiased">From : </span>{" "}
-              <span>{data.sourceName}</span>
+              <span set:html={data.sourceName} />
               <br />
             </>
           )
@@ -144,9 +161,10 @@ const { Content, data, availableLanguages } = Astro.props;
         {
           data.sourceDescription && (
             <>
-              <span class="text-sm leading-tight antialiased">
-                {data.sourceDescription}
-              </span>
+              <span
+                class="text-sm leading-tight antialiased"
+                set:html={data.sourceDescription}
+              />
               <br />
             </>
           )
@@ -173,7 +191,7 @@ const { Content, data, availableLanguages } = Astro.props;
           data.extraInfo && (
             <div class="mt-4 mb-2">
               <h2 class="font-semibold mt-3">Information : </h2>{" "}
-              <p class="mt-1 antialiased">{data.extraInfo}</p>
+              <p class="mt-1 antialiased" set:html={data.extraInfo} />
             </div>
           )
         }

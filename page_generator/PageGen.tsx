@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Languages } from "../src/utils/consts.ts";
+import { Languages } from "../src/utils/consts";
 
 const PageGenrator = () => {
   const [langBlock, setLangBlocks] = useState<any[]>([]);

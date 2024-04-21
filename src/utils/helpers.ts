@@ -1,4 +1,4 @@
-import { SITE_TITLE, SITE_TITLE_DEVANAGRI } from "./consts.ts"
+import { SITE_TITLE, SITE_TITLE_DEVANAGRI } from "./consts"
 
 
 export function parseMarkdown(markdownText: string): string {
