@@ -158,16 +158,25 @@ const ldSchema = {
     </script>
 
     <style>
-      #parchment {
-        position: absolute;
-        display: flex;
-        width: 95%;
-        top: 0%; left: 50%; transform: translate(-50%, 0);
-        margin: 2em 0;
-        padding: 4em;
-        box-shadow: 2px 3px 20px black, 0 0 125px #8f5922 inset;
-        background: #fffef0;
-        filter: url(#wavy2);
+     #parchment {
+          position: absolute;
+          display: flex;
+          width: 95%; /* Default width for larger screens */
+          top: 0%; 
+          left: 50%; 
+          transform: translate(-50%, 0);
+          margin: 2em 0;
+          padding: 4em;
+          box-shadow: 2px 3px 20px black, 0 0 125px #8f5922 inset;
+          background: #fffef0;
+          filter: url(#wavy2);
+      }
+
+      /* Media query for smaller screens (mobile) */
+      @media (max-width: 640px) {
+          #parchment {
+              width: 100%; /* 100% width for mobile devices */
+          }
       }
 
       #parchment:after {
