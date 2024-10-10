@@ -48,15 +48,14 @@
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const modal = document.getElementById("search-modal") as HTMLElement;
-    const openBtn = document.getElementById("open-modal-btn") as HTMLElement;
+    const openBtnDesktop = document.getElementById("open-modal-btn") as HTMLElement;
+    const openBtnMobile = document.getElementById("open-modal-btn-mobile") as HTMLElement;
     const closeBtn = document.getElementById("close-modal-btn") as HTMLElement;
-    const searchInput = document.getElementById(
-      "search-input"
-    ) as HTMLInputElement;
+    const searchInput = document.getElementById("search-input") as HTMLInputElement;
     const searchBtn = document.getElementById("search-btn") as HTMLElement;
 
-    // Open the modal
-    openBtn.addEventListener("click", () => {
+
+    const onBtnClick = () => {
       modal.classList.remove("hidden");
       modal.classList.add("flex");
       setTimeout(() => {
@@ -64,7 +63,12 @@
         modal.classList.remove("opacity-0");
       }, 10); // Small delay to trigger animation
       searchInput.focus();
-    });
+    }
+
+    // Open the modal
+    openBtnDesktop.addEventListener("click",onBtnClick);
+    openBtnMobile.addEventListener("click",onBtnClick);
+
 
     // Close the modal
     closeBtn.addEventListener("click", () => {
