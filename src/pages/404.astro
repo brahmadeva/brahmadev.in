@@ -8,6 +8,7 @@ import {
   SITE_TITLE_DEVANAGRI,
 } from "../utils/consts";
 import MetadataHead from "../components/MetadataHead.astro";
+import SearchModal from "../components/SearchModal.astro";
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
@@ -33,6 +34,7 @@ const pageName = `404 Page Not Found ${SITE_TITLE_SEPARATOR} ${ogSiteName}`;
   from-gray-700 via-gray-900 to-black min-h-screen w-full"
   >
     <Topbar />
+    <SearchModal />
 
     <div
       style="margin-top: 7.5rem;"

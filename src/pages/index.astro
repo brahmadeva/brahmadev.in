@@ -17,6 +17,7 @@ import BrahmaImage from "../media/homepage/brahma_image.png";
 import CosmosBackground from "../media/homepage/cosmos.mp4";
 
 import MetadataHead from "../components/MetadataHead.astro";
+import SearchModal from "../components/SearchModal.astro";
 
 const allpages = (await getCollection("page")).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
@@ -112,6 +113,7 @@ const ldSchema = {
 
   <body class="bg-gray-900 min-h-screen overflow-y-scroll">
     <Topbar />
+    <SearchModal />
 
     <div>
       <video autoplay muted loop id="background-video">

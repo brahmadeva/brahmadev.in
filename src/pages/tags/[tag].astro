@@ -10,6 +10,7 @@ import {
   Tags,
 } from "../../utils/consts";
 import { getCollection } from "astro:content";
+import SearchModal from "../../components/SearchModal.astro";
 
 // this genraes
 export async function getStaticPaths(): Promise<any> {
@@ -81,6 +82,7 @@ const ldSchema = {
   from-gray-700 via-gray-900 to-black min-h-screen w-full"
   >
     <Topbar />
+    <SearchModal />
 
     <div class="mt-24 mx-4">
       <div class="container mx-auto mb-16">

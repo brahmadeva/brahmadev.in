@@ -83,119 +83,116 @@ const { Content, data, availableLanguages } = Astro.props;
   });
 </script>
 
-<div class="w-full mx-auto">
-  <div
-    class="bg-purple-50 px-4 py-6 w-full mx-auto border shadow-lg text-left rounded-lg"
-  >
-    <div class="mx-auto w-full flex justify-center items-center">
+<div class="w-full mx-auto text-left max-w-xs sm:max-w-xl md:max-w-2xl lg:max-w-5xl " id="docBody">
+  <div class="mx-auto w-full flex justify-center items-center">
+    {
+      data.tags.map((tag: any) => (
+        <a
+          href={Tags.includes(tag) ? `/tags/${tag}` : undefined}
+          class={`w-fit bg-orange-500 border  rounded-full px-3 py-1 text-sm font-semibold text-white mr-2 mb-1 mt-2 ${
+            Tags.includes(tag) && "hover:underline"
+          }`}
+        >
+          #{tag}
+        </a>
+      ))
+    }
+  </div>
+
+  <div class="text-center pt-4 pb-3">
+    <h1 class="font-bold text-2xl noto-sans-text">{data.titleDevanagri}</h1>
+    <h2 class="font-semibold text-md mt-1">{data.titleEnglish}</h2>
+  </div>
+
+  {
+    availableLanguages.length > 0 ? (
+      <div class="border w-fit px-20 border-purple-400 rounded-lg pb-6 pt-1 my-2 mx-auto text-center">
+        <h3 class="font-semibold w-full">Select Language</h3>
+        <div class="flex gap-6 pt-0 flex-row flex-wrap justify-center">
+          {Languages.filter((item) =>
+            availableLanguages.includes(item.label)
+          ).map((item) => (
+            <button
+              title={`Show ${item.label} Translation`}
+              id={`lang-${item.label}`}
+              aria-label={`Show ${item.label} Translation`}
+              class={`font-default text-sm relative border border-gray-300 text-gray-700 rounded-full font-bold h-10 w-10`}
+            >
+              {item.symbol}{" "}
+              <span class="capitalize absolute text-[10px] -bottom-5 w-full text-center left-0 block">
+                {item.label}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+    ) : (
+      <div class="w-1/2 mx-auto">
+        <hr class="border-t border-slate-800/40 mx-3 mb-8" />
+      </div>
+    )
+  }
+
+  <div class="px-4 sm:px-8 md:px-16 lg:px-18 mt-8 antialised">
+    <div class="lg:text-lg noto-sans-text">
+      <Content />
+    </div>
+    <br />
+
+    <div
+      style={{
+        lineHeight: "1.6rem",
+      }}
+      class="pb-4 antialiased"
+    >
       {
-        data.tags.map((tag: any) => (
-          <a
-            href={Tags.includes(tag) ? `/tags/${tag}` : undefined}
-            class={`w-fit bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-1 mt-2 ${
-              Tags.includes(tag) && "hover:underline"
-            }`}
-          >
-            #{tag}
-          </a>
-        ))
+        data.sourceName && (
+          <>
+            <span class="font-semibold antialiased">From : </span>{" "}
+            <span set:html={data.sourceName} />
+            <br />
+          </>
+        )
+      }
+
+      {
+        data.sourceDescription && (
+          <>
+            <span
+              class="text-sm leading-tight antialiased"
+              set:html={data.sourceDescription}
+            />
+            <br />
+          </>
+        )
+      }
+
+      {
+        data.sourceLink && (
+          <div class="mt-3 antialiased">
+            <span class="font-semibold">Source Link : </span>{" "}
+            <a
+              href={data.sourceLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-blue-600 hover:text-blue-900 hover:underline"
+            >
+              {" "}
+              {data.sourceLink.substring(0, 50)}...
+            </a>
+          </div>
+        )
+      }
+
+      {
+        data.extraInfo && (
+          <div class="mt-4 mb-2">
+            <h2 class="font-semibold mt-3">Information : </h2>{" "}
+            <p class="mt-1 antialiased" set:html={data.extraInfo} />
+          </div>
+        )
       }
     </div>
-
-    <div class="text-center pt-4 pb-3">
-      <h1 class="font-bold text-2xl">{data.titleDevanagri}</h1>
-      <h2 class="font-semibold text-md mt-1">{data.titleEnglish}</h2>
-    </div>
-
-    {
-      availableLanguages.length > 0 ? (
-        <div class="border w-fit px-20 border-purple-400 rounded-lg pb-6 pt-1 my-2 mx-auto text-center">
-          <h3 class="font-semibold w-full">Select Language</h3>
-          <div class="flex gap-6 pt-0 flex-row flex-wrap justify-center">
-            {Languages.filter((item) =>
-              availableLanguages.includes(item.label)
-            ).map((item) => (
-              <button
-                title={`Show ${item.label} Translation`}
-                id={`lang-${item.label}`}
-                aria-label={`Show ${item.label} Translation`}
-                class={`font-default text-sm relative border border-gray-300 text-gray-700 rounded-full font-bold h-10 w-10`}
-              >
-                {item.symbol}{" "}
-                <span class="capitalize absolute text-[10px] -bottom-5 w-full text-center left-0 block">
-                  {item.label}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-      ) : (
-        <div class="w-1/2 mx-auto">
-          <hr class="border-t border-slate-800/40 mx-3 mb-8" />
-        </div>
-      )
-    }
-
-    <div class="px-4 sm:px-8 md:px-16 lg:px-18 mt-8 antialised">
-      <div class="lg:text-lg">
-        <Content />
-      </div>
-      <br />
-
-      <div
-        style={{
-          lineHeight: "1.6rem",
-        }}
-        class="pb-4 antialiased"
-      >
-        {
-          data.sourceName && (
-            <>
-              <span class="font-semibold antialiased">From : </span>{" "}
-              <span set:html={data.sourceName} />
-              <br />
-            </>
-          )
-        }
-
-        {
-          data.sourceDescription && (
-            <>
-              <span
-                class="text-sm leading-tight antialiased"
-                set:html={data.sourceDescription}
-              />
-              <br />
-            </>
-          )
-        }
-
-        {
-          data.sourceLink && (
-            <div class="mt-3 antialiased">
-              <span class="font-semibold">Source Link : </span>{" "}
-              <a
-                href={data.sourceLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-blue-600 hover:text-blue-900 hover:underline"
-              >
-                {" "}
-                {data.sourceLink.substring(0, 50)}...
-              </a>
-            </div>
-          )
-        }
-
-        {
-          data.extraInfo && (
-            <div class="mt-4 mb-2">
-              <h2 class="font-semibold mt-3">Information : </h2>{" "}
-              <p class="mt-1 antialiased" set:html={data.extraInfo} />
-            </div>
-          )
-        }
-      </div>
-    </div>
   </div>
+
 </div>

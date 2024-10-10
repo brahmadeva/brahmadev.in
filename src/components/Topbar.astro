@@ -2,16 +2,7 @@
 import { SITE_TITLE, Tags } from "../utils/consts";
 ---
 
-<script>
-  // button with id searchButton
-  const buttons = document.querySelectorAll("button.searchButton");
 
-  buttons.forEach((button) => {
-    button.addEventListener("click", () => {
-      alert("Search function coming soon..");
-    });
-  });
-</script>
 <header
   class="z-20 w-full flex place-items-center fixed top-0 backdrop-blur-sm bg-gray/10"
 >
@@ -46,7 +37,7 @@ import { SITE_TITLE, Tags } from "../utils/consts";
         </ul>
 
         <div class="hidden xl:flex items-center space-x-5">
-          <button class="searchButton" aria-label="Search">
+          <button class="searchButton" aria-label="Search" id="open-modal-btn">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 50 50"

@@ -5,7 +5,7 @@
 <link rel="preload" as="image" href="/assets/images/brahma-icon.png" />
 <link rel="icon" type="image/png" href="/assets/images/brahma-icon.png" />
 <link
-  rel="stylesheet preload prefetch" 
+  rel="stylesheet preload prefetch"
   href="/fonts/atkinson-regular.woff"
   as="font"
   type="font/woff"
@@ -17,6 +17,13 @@
   as="font"
   type="font/woff"
   crossorigin
+/>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
+  rel="stylesheet"
 />
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-XEMZGG6H2H"
@@ -36,4 +43,64 @@
 
   gtag("js", new Date());
   gtag("config", "G-XEMZGG6H2H");
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("search-modal") as HTMLElement;
+    const openBtn = document.getElementById("open-modal-btn") as HTMLElement;
+    const closeBtn = document.getElementById("close-modal-btn") as HTMLElement;
+    const searchInput = document.getElementById(
+      "search-input"
+    ) as HTMLInputElement;
+    const searchBtn = document.getElementById("search-btn") as HTMLElement;
+
+    // Open the modal
+    openBtn.addEventListener("click", () => {
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      setTimeout(() => {
+        modal.classList.add("opacity-100");
+        modal.classList.remove("opacity-0");
+      }, 10); // Small delay to trigger animation
+      searchInput.focus();
+    });
+
+    // Close the modal
+    closeBtn.addEventListener("click", () => {
+      closeModal();
+    });
+
+    window.addEventListener("keydown", (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeModal();
+      }
+    });
+
+    // Perform search
+    searchBtn.addEventListener("click", () => {
+      performSearch(searchInput.value);
+    });
+
+    searchInput.addEventListener("keydown", (event: KeyboardEvent) => {
+      if (event.key === "Enter") {
+        performSearch(searchInput.value);
+      }
+    });
+
+    function closeModal() {
+      modal.classList.remove("opacity-100");
+      modal.classList.add("opacity-0");
+      setTimeout(() => {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+      }, 300); // Match this with the transition duration
+    }
+
+    function performSearch(query: string) {
+      const site = "brahmadev.in"; // Replace with your website
+      const searchUrl = `https://www.google.com/search?q=site:${site}+${query}`;
+      window.open(searchUrl, "_blank");
+    }
+  });
 </script>

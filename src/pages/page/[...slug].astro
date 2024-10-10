@@ -13,6 +13,7 @@ import {
 } from "../../utils/consts";
 import MetadataHead from "../../components/MetadataHead.astro";
 import ArticleBody from "../../components/ArticleBody.astro";
+import SearchModal from "../../components/SearchModal.astro";
 
 export async function getStaticPaths() {
   // IMP NOTE: this genrates the dynamic paths for the current route
@@ -117,9 +118,76 @@ const ldSchema = {
       .m_title:first-letter {
         text-transform: uppercase;
       }
+
+      .noto-sans-text {
+        font-family: "Noto Sans", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 300;
+        font-style: normal;
+        font-variation-settings:
+          "wdth" 100;
+      }
+
     </style>
+
     <script type="application/ld+json" set:html={JSON.stringify(ldSchema)}>
     </script>
+
+
+    <script>
+      window.onload = () => ScrollHeight();
+
+      window.addEventListener('resize', () => {
+        ScrollHeight();
+      });
+
+
+      window.addEventListener('load', () => {
+        ScrollHeight();
+      });
+
+      function ScrollHeight(): void {
+        const content = document.querySelector('#parchment') as HTMLElement | null;
+        const container = document.querySelector('#contain') as HTMLElement | null;
+
+        if (content && container) {
+          content.style.height = `${container.offsetHeight + 120}px`;
+        }
+      }
+
+    </script>
+
+    <style>
+      #parchment {
+        position: absolute;
+        display: flex;
+        width: 95%;
+        top: 0%; left: 50%; transform: translate(-50%, 0);
+        margin: 2em 0;
+        padding: 4em;
+        box-shadow: 2px 3px 20px black, 0 0 125px #8f5922 inset;
+        background: #fffef0;
+        filter: url(#wavy2);
+      }
+
+      #parchment:after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      #contain {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: auto;
+        margin: 0 auto;
+      }
+    </style>
     
   </head>
 
@@ -128,18 +196,29 @@ const ldSchema = {
   from-gray-700 via-gray-900 to-black min-h-screen"
   >
     <Topbar />
+    <SearchModal />
 
     <div
       class="px-1 md:px-12 lg:w-3/4 mx-auto py-6 mt-16 leading-normal w-full"
       style="line-height: 2.2rem; line-break: loose;"
     >
-      <ArticleBody
-        data={post.data}
-        availableLanguages={post.data.availableLanguages || []}
-        Content={Content}
-      />
+    <main style="postion: relative; width: 100%; height: auto;">
 
-    </div>
+      <div id="parchment" class=""></div>
+      <div id="contain">
+          <ArticleBody
+            data={post.data}
+            availableLanguages={post.data.availableLanguages || []}
+            Content={Content}
+          />
+      </div>
+    </main>
+    <svg>
+      <filter id="wavy2">
+        <feTurbulence x="0" y="0" baseFrequency="0.02" numOctaves="5" seed="1" />
+        <feDisplacementMap in="SourceGraphic" scale="20" />
+      </filter>
+    </svg>
     <Footer />
   </body>
 </html>
