@@ -83,19 +83,28 @@ const { Content, data, availableLanguages } = Astro.props;
   });
 </script>
 
-<div class="w-full mx-auto text-left px-2 max-w-md sm:max-w-xl lg:max-w-5xl " id="docBody">
+<div
+  class="w-full mx-auto text-left px-2 max-w-md sm:max-w-xl lg:max-w-5xl"
+  id="docBody"
+>
   <div class="mx-auto w-full flex justify-center items-center">
     {
-      data.tags.map((tag: any) => (
-        <a
-          href={Tags.includes(tag) ? `/tags/${tag}` : undefined}
-          class={`w-fit bg-orange-500 border  rounded-full px-3 py-1 text-sm font-semibold text-white mr-2 mb-1 mt-2 ${
-            Tags.includes(tag) && "hover:underline"
-          }`}
-        >
-          #{tag}
-        </a>
-      ))
+      data.tags.map((tag: any) =>
+        Tags.includes(tag) ? (
+          <a
+            href={`/tags/${tag}`}
+            class={`w-fit bg-orange-500 border rounded-full px-3 py-1 text-sm font-semibold text-white mr-2 mb-1 mt-2 hover:underline`}
+          >
+            #{tag}
+          </a>
+        ) : (
+          <span
+            class={`w-fit bg-orange-500 border rounded-full px-3 py-1 text-sm font-semibold text-white mr-2 mb-1 mt-2`}
+          >
+            #{tag}
+          </span>
+        )
+      )
     }
   </div>
 
@@ -178,7 +187,7 @@ const { Content, data, availableLanguages } = Astro.props;
               class="text-blue-600 hover:text-blue-900 hover:underline"
             >
               {" "}
-              {data.sourceLink.substring(0, 50)}...
+              {data.sourceLink.substring(0, 40)}...
             </a>
           </div>
         )
@@ -194,5 +203,4 @@ const { Content, data, availableLanguages } = Astro.props;
       }
     </div>
   </div>
-
 </div>
