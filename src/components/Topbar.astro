@@ -23,17 +23,33 @@ import { SITE_TITLE, Tags } from "../utils/consts";
         </a>
 
         <ul
-          class="hidden md:flex px-4 mx-auto font-semibold font-heading space-x-12"
+          class="hidden md:flex px-4 mx-auto font-semibold font-heading space-x-8"
         >
-          {
-            Tags.map((tag) => (
-              <li>
-                <a class="hover:text-gray-300 capitalize" href={`/tags/${tag}`}>
-                  {tag}
-                </a>
-              </li>
-            ))
-          }
+          <li>
+            <a class="hover:text-gray-300" href="/">
+              Home
+            </a>
+          </li>
+          <li>
+            <a class="hover:text-gray-300" href="/about">
+              About Brahma Ji
+            </a>
+          </li>
+          <li>
+            <a class="hover:text-gray-300" href="/tags">
+              Scriptures
+            </a>
+          </li>
+          <li>
+            <a class="hover:text-gray-300" href="/mantras">
+              Mantras
+            </a>
+          </li>
+          <li>
+            <a class="hover:text-gray-300" href="/temples">
+              Temples
+            </a>
+          </li>
         </ul>
 
         <div class="hidden xl:flex items-center space-x-5">

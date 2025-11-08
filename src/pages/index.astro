@@ -10,11 +10,9 @@ import {
   SITE_DESCRIPTION_DEVANAGRI,
   SITE_TITLE_SEPARATOR,
   DEFAULT_ARTICLE_IMAGE,
+  Tags,
 } from "../utils/consts";
 import { getCollection } from "astro:content";
-import { Image } from "astro:assets";
-import BrahmaImage from "../media/homepage/brahma_image.png";
-import CosmosBackground from "../media/homepage/cosmos.mp4";
 
 import MetadataHead from "../components/MetadataHead.astro";
 import SearchModal from "../components/SearchModal.astro";
@@ -66,8 +64,8 @@ const ldSchema = {
 
     <title>{ogSiteName}</title>
 
-    <link rel="preload prefetch" href={BrahmaImage.src} as="image" />
-    <link rel="preload" href={CosmosBackground} as="video" />
+    <link rel="preload prefetch" href="/assets/images/brahma_image.png" as="image" />
+    <link rel="preload" href="/assets/cosmos.mp4" as="video" />
 
     <meta name="title" lang="en" content={SITE_TITLE} />
     <meta name="description" lang="en" content={SITE_DESCRIPTION} />
@@ -115,75 +113,230 @@ const ldSchema = {
     <Topbar />
     <SearchModal />
 
+    <!-- Background Video -->
     <div>
       <video autoplay muted loop id="background-video">
-        <source src={CosmosBackground} type="video/mp4" />
+        <source src="/assets/cosmos.mp4" type="video/mp4" />
       </video>
     </div>
 
-    <div class="justify-center items-center h-screen">
-      <section class="w-full">
-        <div class="w-full mx-auto flex items-center justify-center">
-          <Image
-            src={BrahmaImage}
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center pt-20">
+      <div class="text-center z-10 max-w-6xl mx-auto px-4">
+        <!-- Sacred Symbol & Image -->
+        <div class="mb-8">
+          <img
+            src="/assets/images/brahma_image.png"
             alt="Brahma Deva Image"
-            style="margin-top: 5.1rem;"
-            class="md:w-64 w-36"
+            class="md:w-72 w-48 mx-auto drop-shadow-2xl"
           />
         </div>
 
-        <div>
-          <div
-            class="mx-auto md:px-16 md:py-4 sm:px-14 sm:py-3 sm:mt-3
-         px-8 py-3 mt-2 shadow rounded-xl border border-slate-700/10
-          text-center bg-slate-700/50 w-fit"
+        <!-- Sanskrit Greeting -->
+        <div class="mb-6">
+          <h1 class="text-4xl md:text-6xl font-bold text-yellow-400 font-serif mb-2">
+            श्री ब्रह्मणे नमः
+          </h1>
+          <p class="text-xl md:text-2xl text-white/80 font-light">
+            Shrī Brahmaṇe Namaḥ
+          </p>
+        </div>
+
+        <!-- Main Title -->
+        <div class="bg-slate-800/60 backdrop-blur-sm rounded-2xl p-8 mb-8 border border-yellow-400/20">
+          <h2 class="text-3xl md:text-5xl font-bold text-white mb-4">
+            {SITE_TITLE_DEVANAGRI}
+          </h2>
+          <h3 class="text-2xl md:text-3xl text-yellow-300 mb-6">
+            {SITE_TITLE}
+          </h3>
+          <p class="text-lg md:text-xl text-white/90 leading-relaxed max-w-4xl mx-auto">
+            The most comprehensive digital repository of authentic Vedic and Puranic knowledge dedicated to 
+            <span class="text-yellow-300 font-semibold">Lord Brahma</span> - 
+            featuring sacred stotras, mantras, kavach, and scriptural wisdom.
+          </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          <a
+            href="/tags"
+            class="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 
+                   text-white font-bold py-4 px-8 rounded-full shadow-lg transform hover:scale-105 
+                   transition-all duration-300 flex items-center justify-center"
           >
-            <h1
-              id="site-description"
-              class="text-white md:text-xl sm:text-lg text-md"
-            >
-              The Rare Collection of Stotras, Kavach, Suktam & Stutis <br />
-              Dedicated to
-              <span class="text-yellow-300">Supreme Lord Brahma Dev</span>.
-            </h1>
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Explore Sacred Texts
+          </a>
+          <a
+            href="#features"
+            class="bg-transparent border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 
+                   hover:text-gray-900 font-bold py-4 px-8 rounded-full transition-all duration-300 
+                   flex items-center justify-center"
+          >
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Learn More
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="relative py-20 bg-gradient-to-b from-gray-900/50 to-gray-800/50">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">
+            Sacred Knowledge Repository
+          </h2>
+          <p class="text-xl text-white/80 max-w-3xl mx-auto">
+            Discover authentic scriptural wisdom with modern accessibility and scholarly precision
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+          <!-- Authentic Sources -->
+          <div class="bg-slate-800/60 backdrop-blur-sm rounded-xl p-8 border border-yellow-400/20 
+                      hover:border-yellow-400/40 transition-all duration-300">
+            <div class="text-yellow-400 text-4xl mb-4">📜</div>
+            <h3 class="text-2xl font-bold text-white mb-4">Authentic Sources</h3>
+            <p class="text-white/80 mb-4">
+              All content sourced from original Vedas, Puranas, and Itihasas with proper scriptural references
+            </p>
+            <ul class="text-white/70 space-y-2">
+              <li>• Rigveda & Other Vedic Texts</li>
+              <li>• 18 Major Puranas</li>
+              <li>• Upanishads & Tantras</li>
+            </ul>
           </div>
 
-          <div class="w-full items-center flex justify-center">
-            <a
-              href="/tags"
-              class="flex mx-auto bg-orange-500 hover:bg-orange-600 mt-4 py-2 px-6 text-white font-bold rounded-full shadow"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-6 h-6 mr-1 items-start align-middle"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m12.75 15 3-3m0 0-3-3m3 3h-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                ></path>
-              </svg>
-              Explore
-            </a>
+          <!-- Multi-Script Support -->
+          <div class="bg-slate-800/60 backdrop-blur-sm rounded-xl p-8 border border-yellow-400/20 
+                      hover:border-yellow-400/40 transition-all duration-300">
+            <div class="text-yellow-400 text-4xl mb-4">🔤</div>
+            <h3 class="text-2xl font-bold text-white mb-4">Multi-Script Access</h3>
+            <p class="text-white/80 mb-4">
+              Sanskrit integrity preserved across multiple scripts and translations
+            </p>
+            <ul class="text-white/70 space-y-2">
+              <li>• Devanagari Script</li>
+              <li>• IAST Transliteration</li>
+              <li>• English & Hindi Translations</li>
+            </ul>
           </div>
-          <div class="container mx-auto">
-            <div class="mx-auto px-6 py-3 mb-2">
-              <h2 class="font-bold text-3xl text-white">Recently Added</h2>
-            </div>
-            <RecentCards pages={pages} />
+
+          <!-- Scholarly Metadata -->
+          <div class="bg-slate-800/60 backdrop-blur-sm rounded-xl p-8 border border-yellow-400/20 
+                      hover:border-yellow-400/40 transition-all duration-300">
+            <div class="text-yellow-400 text-4xl mb-4">🎯</div>
+            <h3 class="text-2xl font-bold text-white mb-4">Scholarly Precision</h3>
+            <p class="text-white/80 mb-4">
+              Complete metadata for each mantra and stotra following traditional classification
+            </p>
+            <ul class="text-white/70 space-y-2">
+              <li>• ऋषि (Rishi) Information</li>
+              <li>• देवता (Devata) Details</li>
+              <li>• छन्द (Chhanda) & स्वर (Swar)</li>
+            </ul>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- <section class="w-full mt-16 sm:mt-20 md:mt-12"> -->
+    <!-- Categories Section -->
+    <section class="relative py-20 bg-slate-900/50">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">
+            Sacred Categories
+          </h2>
+          <p class="text-xl text-white/80">
+            Explore various forms of devotional literature dedicated to Lord Brahma
+          </p>
+        </div>
 
-      <!-- </section> -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Tags.map((tag) => (
+            <a
+              href={`/tags/${tag}`}
+              class="group bg-gradient-to-br from-slate-800/80 to-slate-700/80 backdrop-blur-sm 
+                     rounded-xl p-6 border border-yellow-400/20 hover:border-yellow-400/50 
+                     transform hover:scale-105 transition-all duration-300 hover:shadow-2xl"
+            >
+              <h3 class="text-2xl font-bold text-yellow-400 mb-3 capitalize group-hover:text-yellow-300">
+                {tag}
+              </h3>
+              <p class="text-white/70 group-hover:text-white/90 transition-colors">
+                {tag === 'stotram' && 'Sacred hymns of praise and devotion'}
+                {tag === 'stuti' && 'Devotional prayers and eulogies'}
+                {tag === 'kavach' && 'Protective mantras and armor prayers'}
+                {tag === 'namavali' && 'Collections of divine names'}
+                {tag === 'suktam' && 'Vedic hymns and sacred verses'}
+                {tag === 'vidhi' && 'Ritual procedures and worship methods'}
+              </p>
+              <div class="mt-4 text-yellow-400 group-hover:text-yellow-300">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M9 5l7 7-7 7"/>
+                </svg>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
 
-      <div class="mt-20"><Footer /></div>
-    </div>
+    <!-- Recent Content Section -->
+    <section class="relative py-20 bg-gradient-to-b from-gray-800/50 to-gray-900/50">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">
+            Recently Added Sacred Texts
+          </h2>
+          <p class="text-xl text-white/80">
+            Newly digitized stotras and mantras with complete translations
+          </p>
+        </div>
+        <RecentCards pages={pages} />
+      </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section class="relative py-20 bg-gradient-to-r from-orange-900/30 to-red-900/30">
+      <div class="max-w-4xl mx-auto text-center px-4">
+        <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">
+          Begin Your Spiritual Journey
+        </h2>
+        <p class="text-xl text-white/90 mb-8 leading-relaxed">
+          Join thousands of devotees in rediscovering the profound wisdom and divine grace of Lord Brahma 
+          through authentic Vedic literature, sacred mantras, and timeless spiritual practices.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            href="/tags/stotram"
+            class="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 
+                   text-white font-bold py-4 px-8 rounded-full shadow-lg transform hover:scale-105 
+                   transition-all duration-300"
+          >
+            Start with Stotrams
+          </a>
+          <a
+            href="/tags/mantra"
+            class="bg-transparent border-2 border-white text-white hover:bg-white hover:text-gray-900 
+                   font-bold py-4 px-8 rounded-full transition-all duration-300"
+          >
+            Explore Mantras
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <Footer />
+  </body>
   </body>
 </html>
