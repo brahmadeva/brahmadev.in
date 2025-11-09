@@ -77,51 +77,68 @@ const ldSchema = {
 
   </head>
 
-  <body
-    class="bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))]
-  from-gray-700 via-gray-900 to-black min-h-screen w-full"
-  >
+  <body class="bg-gray-900 min-h-screen">
     <Topbar />
     <SearchModal />
 
-    <div class="mt-24 mx-4">
-      <div class="container mx-auto mb-16">
-        <h2
-          class="text-white text-2xl font-bold ml-4 capitalize mb-5 underline underline-offset-8"
-        >
-          {tag}
-        </h2>
-        <RecentCards pages={MyPagesCollection} />
+    <!-- Hero Section -->
+    <div class="relative pt-24 pb-12 bg-gradient-to-b from-gray-900 via-slate-900 to-gray-800">
+      <div class="max-w-7xl mx-auto px-4">
+        <!-- Breadcrumb -->
+        <nav class="mb-6 flex items-center text-sm text-white/60">
+          <a href="/tags" class="hover:text-yellow-400 transition-colors">Tags</a>
+          <svg class="w-4 h-4 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+          <span class="text-white capitalize">{tag}</span>
+        </nav>
 
-        {
-          !MyPagesCollection.length && (
-            <div class="w-full sm:w-3/4 md:w-1/2 py-12 leading-normal shadow-md bg-gray-50 text-slate-900 mx-auto px-14 rounded-lg">
-              <h1 class="text-2xl font-bold">
-                No documents found in this section..
-              </h1>
-              <p class="mt-3 mb-7 font-bold">
-                But don't worry! Stay tuned, they're being added soon ;{")"}
-              </p>
-
-              <a
-                href="/"
-                class="bg-blue-500 hover:bg-blue-800 rounded-lg shadow-md text-white py-2 px-6"
-              >
-                Go Back
-              </a>
-            </div>
-          )
-        }
-        <!--  <hr class="border-t mt-6 w-1/2 mx-auto border-gray-500"/> -->
+        <div class="text-center mb-8">
+          <div class="inline-flex items-center gap-3 mb-4">
+            <span class="text-5xl text-yellow-400">#</span>
+            <h1 class="text-4xl md:text-5xl font-bold text-yellow-400 capitalize">
+              {tag}
+            </h1>
+          </div>
+          <p class="text-white/70 text-lg">
+            {MyPagesCollection.length}&nbsp;{MyPagesCollection.length === 1 ? 'item' : 'items'} in this collection
+          </p>
+        </div>
       </div>
     </div>
 
-    <!-- <div class="w-full flex text-gray-100 font-extrabold text-2xl text-center justify-center items-center">
-      <h1 class="w-10/12 md:w-8/12 flex">
+    <!-- Content Section -->
+    <div class="bg-gray-900 py-12">
+      <div class="max-w-7xl mx-auto px-4">
+        {MyPagesCollection.length > 0 ? (
+          <RecentCards pages={MyPagesCollection} />
+        ) : (
+          <div class="max-w-2xl mx-auto">
+            <div class="bg-slate-800/60 backdrop-blur-sm rounded-xl p-12 border border-slate-700 text-center">
+              <div class="text-6xl mb-4">📚</div>
+              <h2 class="text-2xl font-bold text-white mb-3">
+                No documents found
+              </h2>
+              <p class="text-white/70 mb-8">
+                Content for this tag is being added soon. Stay tuned!
+              </p>
+              <a
+                href="/tags"
+                class="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 
+                       hover:from-orange-600 hover:to-red-600 text-white font-bold py-3 px-6 
+                       rounded-lg transition-all duration-300 hover:scale-105 shadow-lg"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Browse All Tags
+              </a>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
 
-      </h1>
-    </div> -->
-
-    <div style="margin-top: 12.5rem;"><Footer /></div>
+    <Footer />
   </body>
 </html>

@@ -63,35 +63,91 @@ const ldSchema = {
     
   </head>
 
-  <body
-    class="bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))]
-  from-gray-700 via-gray-900 to-black min-h-screen w-full"
-  >
+  <body class="bg-gray-900 min-h-screen">
     <Topbar />
     <SearchModal />
 
-    <div class="mt-24 mx-4">
-      {
-        Tags.map((tag) => 
-        {
-            const myPages = pages.filter((post: any) =>
+    <!-- Hero Section -->
+    <div class="relative pt-24 pb-12 bg-gradient-to-b from-gray-900 via-slate-900 to-gray-800">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-8">
+          <h1 class="text-4xl md:text-5xl font-bold text-yellow-400 mb-3">
+            Browse by Tags
+          </h1>
+          <p class="text-white/70 text-lg max-w-2xl mx-auto">
+            Explore our collection organized by topics and themes
+          </p>
+        </div>
+
+        <!-- Tag Summary Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto mb-8">
+          {
+            Tags.map((tag) => {
+              const myPages = pages.filter((post: any) =>
                 checkItem(post.data.tags, tag)
-            )
-            if (myPages.length == 0) return null
-            else return  (
-                <div class="container mx-auto mb-16">
-                    <h2 class="
-                    text-white text-2xl font-bold ml-2 capitalize mb-4 underline underline-offset-8
-                    ">{tag}</h2>
-                    <RecentCards pages={myPages} />
-                  <!--  <hr class="border-t mt-6 w-1/2 mx-auto border-gray-500"/> --> 
-                </div>
-            )
-        })
-      }
+              );
+              if (myPages.length == 0) return null;
+              return (
+                <a
+                  href={`/tags/${tag}`}
+                  class="group bg-slate-800/60 backdrop-blur-sm rounded-xl p-6 border border-slate-700 
+                         hover:border-yellow-400/40 transition-all duration-300 hover:scale-105"
+                >
+                  <div class="flex items-center justify-between">
+                    <h3 class="text-xl font-semibold text-white capitalize group-hover:text-yellow-400 transition-colors">
+                      {tag}
+                    </h3>
+                    <span class="bg-yellow-400/20 text-yellow-400 rounded-full px-3 py-1 text-sm font-bold">
+                      {myPages.length}
+                    </span>
+                  </div>
+                  <p class="text-white/60 text-sm mt-2">
+                    {myPages.length}&nbsp;{myPages.length === 1 ? 'item' : 'items'}
+                  </p>
+                </a>
+              );
+            })
+          }
+        </div>
+      </div>
     </div>
 
+    <!-- Content Section -->
+    <div class="bg-gray-900 py-12">
+      <div class="max-w-7xl mx-auto px-4">
+        {
+          Tags.map((tag) => {
+            const myPages = pages.filter((post: any) =>
+              checkItem(post.data.tags, tag)
+            );
+            if (myPages.length == 0) return null;
+            else return (
+              <div class="mb-16" id={tag}>
+                <div class="flex items-center justify-between mb-6">
+                  <h2 class="text-3xl font-bold text-yellow-400 capitalize flex items-center gap-3">
+                    <span class="text-yellow-400">#</span>
+                    {tag}
+                  </h2>
+                  <a
+                    href={`/tags/${tag}`}
+                    class="text-white/70 hover:text-yellow-400 text-sm font-medium transition-colors
+                           flex items-center gap-2"
+                  >
+                    View all
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </a>
+                </div>
+                <RecentCards pages={myPages} />
+                <hr class="border-slate-700 mt-12" />
+              </div>
+            );
+          })
+        }
+      </div>
+    </div>
 
-    <div style="margin-top: 12.5rem;"><Footer /></div>
+    <Footer />
   </body>
 </html>
