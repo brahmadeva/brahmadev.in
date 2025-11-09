@@ -8,7 +8,9 @@ import { SITE_TITLE, Tags } from "../utils/consts";
 >
   <section class="relative mx-auto w-full">
     <nav class="flex justify-between bg-gray-900/50 text-white w-full">
-      <div class="px-5 xl:px-10 py-3 flex w-full items-center">
+      <div class="px-5 xl:px-10 py-3 flex w-full items-center 
+      justify-between
+      ">
         <a
           id="TOPBAR_SITE_TITLE"
           class="text-lg font-bold font-heading hover:text-gray-300 flex items-center"
@@ -23,31 +25,49 @@ import { SITE_TITLE, Tags } from "../utils/consts";
         </a>
 
         <ul
-          class="hidden md:flex px-4 mx-auto font-semibold font-heading space-x-8"
+          class="hidden md:flex px-4  font-semibold font-heading space-x-8
+          pr-32
+          "
         >
           <li>
             <a class="hover:text-gray-300" href="/">
               Home
             </a>
           </li>
-          <li>
-            <a class="hover:text-gray-300" href="/about">
-              About Brahma Ji
-            </a>
-          </li>
+        
           <li>
             <a class="hover:text-gray-300" href="/tags">
               Scriptures
             </a>
           </li>
           <li>
-            <a class="hover:text-gray-300" href="/mantras">
-              Mantras
+            <a class="hover:text-gray-300" href="/tags/stotram">
+              Stotram
             </a>
           </li>
           <li>
-            <a class="hover:text-gray-300" href="/temples">
-              Temples
+            <a class="hover:text-gray-300" href="/tags/stuti">
+              Stuti
+            </a>
+          </li>
+
+           <li>
+            <a class="hover:text-gray-300" href="/tags/kavach">
+              Kavach
+            </a>
+          </li>
+
+
+           <li>
+            <a class="hover:text-gray-300" href="/tags/namavali">
+              Namavali
+            </a>
+          </li>
+
+
+          <li>
+            <a class="hover:text-gray-300" href="/tags/suktam">
+              Suktam
             </a>
           </li>
         </ul>
