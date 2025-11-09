@@ -10,14 +10,11 @@ const { Content, data, availableLanguages } = Astro.props;
   define:vars={{ data: data, availableLanguages: availableLanguages }}
 >
   const selectedClasses = "bg-yellow-400 text-gray-900 border-yellow-400 scale-110";
-
   const langButtons = availableLanguages.map((lang) => `lang-${lang}`);
 
   const removeSelectedFromAll = () => {
     langButtons.forEach((id) => {
-      document
-        .getElementById(id)
-        .classList.remove(...selectedClasses.split(" "));
+      document.getElementById(id).classList.remove(...selectedClasses.split(" "));
     });
   };
 
@@ -25,20 +22,13 @@ const { Content, data, availableLanguages } = Astro.props;
     if (availableLanguages.length > 0) {
       removeSelectedFromAll();
       const firstLangId = `lang-${availableLanguages[0]}`;
-      document
-        .getElementById(firstLangId)
-        .classList.add(...selectedClasses.split(" "));
+      document.getElementById(firstLangId).classList.add(...selectedClasses.split(" "));
 
-      document
-        .querySelectorAll(`.${availableLanguages[0]}-translation`)
-        .forEach((element) => {
-          element.style.display = "block";
-        });
+      document.querySelectorAll(`.${availableLanguages[0]}-translation`).forEach((element) => {
+        element.style.display = "block";
+      });
 
-      const otherLanguages = availableLanguages.filter(
-        (item) => item != availableLanguages[0]
-      );
-
+      const otherLanguages = availableLanguages.filter((item) => item != availableLanguages[0]);
       otherLanguages.forEach((lang) => {
         document.querySelectorAll(`.${lang}-translation`).forEach((element) => {
           element.style.display = "none";
@@ -48,30 +38,17 @@ const { Content, data, availableLanguages } = Astro.props;
 
     langButtons.forEach((buttonId, languageId) => {
       const language = availableLanguages[languageId];
-
       document.getElementById(buttonId).onclick = () => {
         removeSelectedFromAll();
-
-        document
-          .getElementById(buttonId)
-          .classList.add(...selectedClasses.split(" "));
-
-        document
-          .querySelectorAll(`.${language}-translation`)
-          .forEach((element) => {
-            element.style.display = "block";
-          });
-
-        const otherLanguages = availableLanguages.filter(
-          (item) => item != language
-        );
-
+        document.getElementById(buttonId).classList.add(...selectedClasses.split(" "));
+        document.querySelectorAll(`.${language}-translation`).forEach((element) => {
+          element.style.display = "block";
+        });
+        const otherLanguages = availableLanguages.filter((item) => item != language);
         otherLanguages.forEach((lang) => {
-          document
-            .querySelectorAll(`.${lang}-translation`)
-            .forEach((element) => {
-              element.style.display = "none";
-            });
+          document.querySelectorAll(`.${lang}-translation`).forEach((element) => {
+            element.style.display = "none";
+          });
         });
       };
     });
@@ -82,30 +59,53 @@ const { Content, data, availableLanguages } = Astro.props;
   });
 </script>
 
-<div class="w-full relative">
-  <!-- Parchment Paper Effect -->
+<div class="w-full relative mt-12">
   <style>
-    /* Parchment/Manuscript Paper Effect */
     .parchment-paper {
       position: relative;
-      background: linear-gradient(to bottom, #f4e8d0 0%, #f9f3e3 50%, #f4e8d0 100%);
+      background: #fffef0;
       box-shadow: 
-        0 0 80px rgba(139, 89, 34, 0.3) inset,
-        0 10px 40px rgba(0, 0, 0, 0.4),
-        0 0 20px rgba(139, 89, 34, 0.2);
-      border-radius: 8px;
-      padding: 3rem 2.5rem;
-      border: 2px solid rgba(139, 89, 34, 0.3);
-      filter: url(#paper-texture);
+        2px 3px 20px rgba(0, 0, 0, 0.5),
+        0 0 100px rgba(139, 89, 34, 0.4) inset;
+      padding: 2rem 1.25rem;
+      margin: 0;
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    /* Apply wavy edges only to a border element, not the content */
+    .parchment-paper::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: transparent;
+      border: 1px solid rgba(139, 89, 34, 0.3);
+      filter: url(#wavy-edges);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @media (min-width: 640px) {
+      .parchment-paper {
+        padding: 2.5rem 2rem;
+      }
     }
 
     @media (min-width: 768px) {
       .parchment-paper {
-        padding: 4rem 4rem;
+        padding: 3rem 3rem;
       }
     }
 
-    /* Add aged paper texture */
+    @media (min-width: 1024px) {
+      .parchment-paper {
+        padding: 4rem 5rem;
+      }
+    }
+
     .parchment-paper::before {
       content: "";
       position: absolute;
@@ -114,576 +114,197 @@ const { Content, data, availableLanguages } = Astro.props;
       right: 0;
       bottom: 0;
       background-image: 
-        radial-gradient(circle at 20% 30%, rgba(139, 89, 34, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 80% 70%, rgba(139, 89, 34, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 40% 80%, rgba(139, 89, 34, 0.06) 0%, transparent 40%);
+        radial-gradient(circle at 20% 30%, rgba(139, 89, 34, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(139, 89, 34, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(139, 89, 34, 0.04) 0%, transparent 40%);
       pointer-events: none;
-      border-radius: 8px;
+      z-index: 0;
     }
 
-    /* Decorative borders */
-    .parchment-paper::after {
-      content: "";
-      position: absolute;
-      top: 1.5rem;
-      left: 1.5rem;
-      right: 1.5rem;
-      bottom: 1.5rem;
-      border: 1px solid rgba(139, 89, 34, 0.2);
-      border-radius: 4px;
-      pointer-events: none;
-    }
-
-    /* Content wrapper inside parchment */
     #docBody {
       position: relative;
       z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
-    /* Global text styling for manuscript look */
-    #docBody,
-    #docBody * {
-      color: #2d1810 !important; /* Dark brown for aged ink */
+    #docBody, #docBody * {
+      color: #2d1810 !important;
       text-rendering: optimizeLegibility !important;
       -webkit-font-smoothing: antialiased !important;
-      -moz-osx-font-smoothing: grayscale !important;
     }
 
-    /* Headings - ornate manuscript style */
-    #docBody :global(h1),
-    #docBody :global(h2),
-    #docBody :global(h3),
-    #docBody :global(h4),
-    #docBody :global(h5),
-    #docBody :global(h6) {
-      color: #8b4513 !important; /* Saddle brown for headings */
-      margin-top: 2.5rem !important;
-      margin-bottom: 1.5rem !important;
+    #docBody :global(h1), #docBody :global(h2), #docBody :global(h3), #docBody :global(h4) {
+      color: #8b4513 !important;
+      margin-top: 1.75rem !important;
+      margin-bottom: 1rem !important;
       font-weight: 700 !important;
-      line-height: 1.3 !important;
       text-align: center !important;
-      letter-spacing: 0.03em !important;
+    }
+
+    @media (min-width: 768px) {
+      #docBody :global(h1), #docBody :global(h2), #docBody :global(h3), #docBody :global(h4) {
+        margin-top: 2.5rem !important;
+        margin-bottom: 1.5rem !important;
+      }
     }
 
     #docBody :global(h1) {
-      font-size: 2.25rem !important;
-      border-bottom: 3px double rgba(139, 69, 19, 0.5) !important;
-      padding-bottom: 1rem !important;
-      text-transform: uppercase !important;
-      letter-spacing: 0.05em !important;
+      font-size: 1.625rem !important;
+      border-bottom: 2px double rgba(139, 69, 19, 0.5) !important;
+      padding-bottom: 0.625rem !important;
+    }
+
+    @media (min-width: 768px) {
+      #docBody :global(h1) {
+        font-size: 2.25rem !important;
+        border-bottom: 3px double rgba(139, 69, 19, 0.5) !important;
+        padding-bottom: 1rem !important;
+      }
     }
 
     #docBody :global(h2) {
-      font-size: 2rem !important;
+      font-size: 1.375rem !important;
       border-bottom: 2px solid rgba(139, 69, 19, 0.3) !important;
-      padding-bottom: 0.75rem !important;
+      padding-bottom: 0.5rem !important;
     }
 
-    #docBody :global(h3) {
-      font-size: 1.75rem !important;
+    @media (min-width: 768px) {
+      #docBody :global(h2) {
+        font-size: 2rem !important;
+        padding-bottom: 0.75rem !important;
+      }
     }
 
-    #docBody :global(h4) {
-      font-size: 1.5rem !important;
-    }
-
-    /* Paragraphs - manuscript text */
     #docBody :global(p) {
       color: #2d1810 !important;
-      line-height: 2.8rem !important;
-      margin-bottom: 2rem !important;
-      font-size: 1.2rem !important;
-      letter-spacing: 0.02em !important;
-      text-indent: 2rem !important; /* Traditional manuscript indent */
-      text-align: justify !important;
+      line-height: 1.85rem !important;
+      margin-bottom: 1.125rem !important;
+      font-size: 0.9375rem !important;
+      text-align: left !important;
     }
 
-    /* First paragraph no indent */
-    #docBody :global(h1 + p),
-    #docBody :global(h2 + p),
-    #docBody :global(h3 + p) {
-      text-indent: 0 !important;
+    @media (min-width: 640px) {
+      #docBody :global(p) {
+        line-height: 2rem !important;
+        font-size: 1rem !important;
+        text-align: justify !important;
+      }
     }
 
-    /* Drop cap for first letter (optional enhancement) */
-    #docBody :global(p:first-of-type::first-letter) {
-      font-size: 3.5rem !important;
-      float: left !important;
-      line-height: 0.9 !important;
-      margin: 0.1rem 0.5rem 0 0 !important;
-      color: #8b4513 !important;
-      font-weight: 700 !important;
+    @media (min-width: 768px) {
+      #docBody :global(p) {
+        line-height: 2.2rem !important;
+        margin-bottom: 1.5rem !important;
+        font-size: 1.05rem !important;
+      }
     }
 
-    /* Devanagari text specific - sacred manuscript style */
-    #docBody :global(.noto-sans-text),
-    #docBody :global([lang="hi"]),
-    #docBody.noto-sans-text,
-    #docBody.noto-sans-text * {
-      font-size: 1.5rem !important;
-      line-height: 3.2rem !important;
-      color: #1a0d08 !important; /* Darker for Sanskrit */
+    #docBody :global(.noto-sans-text), #docBody.noto-sans-text, #docBody.noto-sans-text * {
+      font-size: 1.0625rem !important;
+      line-height: 2.125rem !important;
+      color: #1a0d08 !important;
       font-weight: 500 !important;
-      text-indent: 0 !important;
     }
 
-    #docBody :global(strong),
-    #docBody :global(b) {
-      color: #6b2c0f !important; /* Darker brown */
+    @media (min-width: 640px) {
+      #docBody :global(.noto-sans-text), #docBody.noto-sans-text, #docBody.noto-sans-text * {
+        font-size: 1.1875rem !important;
+        line-height: 2.375rem !important;
+      }
+    }
+
+    @media (min-width: 768px) {
+      #docBody :global(.noto-sans-text), #docBody.noto-sans-text, #docBody.noto-sans-text * {
+        font-size: 1.25rem !important;
+        line-height: 2.5rem !important;
+      }
+    }
+
+    #docBody :global(strong) {
+      color: #6b2c0f !important;
       font-weight: 700 !important;
     }
 
-    #docBody :global(em),
-    #docBody :global(i) {
-      color: #8b4513 !important;
-      font-style: italic !important;
-    }
-
-    /* Blockquotes - ornate manuscript boxes */
     #docBody :global(blockquote) {
-      border-left: 5px solid #8b4513 !important;
+      border-left: 3px solid #8b4513 !important;
       background: rgba(139, 69, 19, 0.08) !important;
-      padding: 2rem 2.5rem !important;
-      margin: 2.5rem 0 !important;
+      padding: 1rem 1.25rem !important;
+      margin: 1.5rem 0 !important;
       border-radius: 4px !important;
-      font-style: italic !important;
-      color: #3d2010 !important;
-      box-shadow: 
-        0 2px 8px rgba(0, 0, 0, 0.1),
-        inset 0 0 30px rgba(139, 69, 19, 0.05) !important;
-      position: relative !important;
+      font-size: 0.9rem !important;
     }
 
-    #docBody :global(blockquote::before) {
-      content: """;
-      position: absolute;
-      top: -0.5rem;
-      left: 1rem;
-      font-size: 4rem;
-      color: rgba(139, 69, 19, 0.3);
-      font-family: Georgia, serif;
+    @media (min-width: 768px) {
+      #docBody :global(blockquote) {
+        border-left: 5px solid #8b4513 !important;
+        padding: 2rem 2.5rem !important;
+        margin: 2.5rem 0 !important;
+        font-size: 1rem !important;
+      }
     }
 
-    #docBody :global(blockquote *) {
-      color: #3d2010 !important;
+    #docBody :global(ul), #docBody :global(ol) {
+      padding-left: 1.5rem !important;
+      margin: 1.25rem 0 !important;
     }
 
-    #docBody :global(blockquote p) {
-      margin-bottom: 0.75rem !important;
-      text-indent: 0 !important;
-    }
-
-    /* Lists - manuscript style */
-    #docBody :global(ul),
-    #docBody :global(ol) {
-      color: #2d1810 !important;
-      padding-left: 2.5rem !important;
-      margin: 2rem 0 !important;
+    @media (min-width: 768px) {
+      #docBody :global(ul), #docBody :global(ol) {
+        padding-left: 2.5rem !important;
+        margin: 2rem 0 !important;
+      }
     }
 
     #docBody :global(li) {
-      margin-bottom: 1.25rem !important;
-      line-height: 2.5rem !important;
-      color: #2d1810 !important;
-      font-size: 1.2rem !important;
+      margin-bottom: 0.875rem !important;
+      line-height: 2rem !important;
+      font-size: 0.9375rem !important;
     }
 
-    #docBody :global(li::marker) {
-      color: #8b4513 !important;
-      font-weight: 700 !important;
+    @media (min-width: 640px) {
+      #docBody :global(li) {
+        margin-bottom: 1rem !important;
+        line-height: 2.25rem !important;
+        font-size: 1rem !important;
+      }
     }
 
-    /* Code - manuscript notation style */
-    #docBody :global(code) {
-      background: rgba(139, 69, 19, 0.12) !important;
-      color: #6b2c0f !important;
-      padding: 0.3rem 0.6rem !important;
-      border-radius: 3px !important;
-      font-size: 1em !important;
-      border: 1px solid rgba(139, 69, 19, 0.2) !important;
-      font-family: 'Courier New', monospace !important;
+    @media (min-width: 768px) {
+      #docBody :global(li) {
+        margin-bottom: 1.25rem !important;
+        line-height: 2.5rem !important;
+        font-size: 1.05rem !important;
+      }
     }
 
-    #docBody :global(pre) {
-      background: rgba(139, 69, 19, 0.08) !important;
-      border: 2px solid rgba(139, 69, 19, 0.3) !important;
-      border-radius: 6px !important;
-      padding: 2rem !important;
-      overflow-x: auto !important;
-      margin: 2.5rem 0 !important;
-      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-    }
-
-    #docBody :global(pre code) {
-      background: transparent !important;
-      border: none !important;
-      padding: 0 !important;
-    }
-
-    /* Links - traditional manuscript link style */
     #docBody :global(a) {
-      color: #a0522d !important; /* Sienna */
-      text-decoration: none !important;
-      transition: all 0.3s !important;
+      color: #a0522d !important;
       border-bottom: 1px dotted #a0522d !important;
-      font-weight: 500 !important;
+      word-break: break-word !important;
     }
 
-    #docBody :global(a:hover) {
-      color: #8b4513 !important;
-      border-bottom: 1px solid #8b4513 !important;
-    }
-
-    /* Horizontal rules - decorative dividers */
-    #docBody :global(hr) {
-      border: none !important;
-      height: 2px !important;
-      background: linear-gradient(
-        to right, 
-        transparent, 
-        rgba(139, 69, 19, 0.5) 20%, 
-        rgba(139, 69, 19, 0.5) 80%, 
-        transparent
-      ) !important;
-      margin: 3rem auto !important;
-      position: relative !important;
-    }
-
-    #docBody :global(hr::after) {
-      content: "❧";
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      background: #f4e8d0;
-      padding: 0 1rem;
-      color: #8b4513;
-      font-size: 1.5rem;
-    }
-
-    /* Tables - manuscript table style */
-    #docBody :global(table) {
-      width: 100% !important;
-      border-collapse: collapse !important;
-      margin: 2.5rem 0 !important;
-      background: rgba(255, 255, 255, 0.3) !important;
-    }
-
-    #docBody :global(th),
-    #docBody :global(td) {
-      border: 1px solid rgba(139, 69, 19, 0.3) !important;
-      padding: 1rem 1.5rem !important;
-      text-align: left !important;
-      color: #2d1810 !important;
-    }
-
-    #docBody :global(th) {
-      background: rgba(139, 69, 19, 0.15) !important;
-      font-weight: 700 !important;
-      color: #6b2c0f !important;
-    }
-
-    #docBody :global(tr:hover) {
-      background: rgba(139, 69, 19, 0.08) !important;
-    }
-
-    /* Translation sections with smooth transitions */
-    #docBody :global(.devanagari-translation),
-    #docBody :global(.english-translation),
-    #docBody :global(.hindi-translation) {
+    #docBody 
+    :global(.sanskrit-shlok),
+    :global(.devanagari-translation), #docBody :global(.english-translation), #docBody :global(.hindi-translation) {
       animation: fadeIn 0.5s ease-in-out !important;
       padding: 1.5rem 0 !important;
     }
 
-    /* Verse numbering - ornate style */
-    #docBody :global(.verse-number) {
-      color: #8b4513 !important;
-      font-weight: 700 !important;
-      margin-right: 0.75rem !important;
-      font-size: 1.1em !important;
-      border: 2px solid #8b4513 !important;
-      border-radius: 50% !important;
-      padding: 0.25rem 0.5rem !important;
-      display: inline-block !important;
-      min-width: 2rem !important;
-      text-align: center !important;
-    }
-
-    /* Special dividers - manuscript flourish */
-    #docBody :global(.divider) {
-      margin: 3rem 0 !important;
-      text-align: center !important;
-      color: #8b4513 !important;
-      font-size: 2rem !important;
-    }
-
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(-15px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Selection color - manuscript highlight */
-    #docBody ::selection {
-      background: rgba(139, 69, 19, 0.2) !important;
-      color: #2d1810 !important;
+      from { opacity: 0; transform: translateY(-15px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 
-  <!-- SVG Filter for Paper Texture -->
   <svg style="position: absolute; width: 0; height: 0;">
-    <filter id="paper-texture">
-      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" result="noise" seed="2" />
-      <feDiffuseLighting in="noise" lighting-color="#f4e8d0" surfaceScale="1" result="diffLight">
-        <feDistantLight azimuth="45" elevation="60" />
-      </feDiffuseLighting>
-      <feComposite in="SourceGraphic" in2="diffLight" operator="arithmetic" k1="0.2" k2="0.8" k3="0.2" k4="0" />
+    <filter id="wavy-edges" x="-50%" y="-50%" width="200%" height="200%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="4" result="noise" seed="2" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="6" xChannelSelector="R" yChannelSelector="G" />
     </filter>
   </svg>
 
-  <div class="parchment-paper">
-    <div id="docBody" class="noto-sans-text prose prose-lg max-w-none">
-      <Content />
-    </div>
-  </div>
-</div>
-
-    /* Enhanced Article Body Styling */
-    #docBody :global(h1),
-    #docBody :global(h2),
-    #docBody :global(h3),
-    #docBody :global(h4),
-    #docBody :global(h5),
-    #docBody :global(h6) {
-      color: #fbbf24 !important; /* yellow-400 */
-      margin-top: 2.5rem !important;
-      margin-bottom: 1.5rem !important;
-      font-weight: 700 !important;
-      line-height: 1.3 !important;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
-    }
-
-    #docBody :global(h1) {
-      font-size: 2.25rem !important;
-      border-bottom: 3px solid rgba(251, 191, 36, 0.4) !important;
-      padding-bottom: 1rem !important;
-    }
-
-    #docBody :global(h2) {
-      font-size: 2rem !important;
-    }
-
-    #docBody :global(h3) {
-      font-size: 1.75rem !important;
-    }
-
-    #docBody :global(h4) {
-      font-size: 1.5rem !important;
-    }
-
-    #docBody :global(p) {
-      color: rgba(255, 255, 255, 0.98) !important;
-      line-height: 2.8rem !important;
-      margin-bottom: 2rem !important;
-      font-size: 1.2rem !important;
-      letter-spacing: 0.02em !important;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
-    }
-
-    /* Devanagari text specific - make it even bigger and brighter */
-    #docBody :global(.noto-sans-text),
-    #docBody :global([lang="hi"]),
-    #docBody.noto-sans-text,
-    #docBody.noto-sans-text * {
-      font-size: 1.4rem !important;
-      line-height: 3rem !important;
-      color: rgba(255, 255, 255, 1) !important;
-      font-weight: 400 !important;
-    }
-
-    #docBody :global(strong),
-    #docBody :global(b) {
-      color: #fde68a !important; /* yellow-200 */
-      font-weight: 700 !important;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
-    }
-
-    #docBody :global(em),
-    #docBody :global(i) {
-      color: #fef3c7 !important; /* yellow-100 */
-      font-style: italic !important;
-    }
-
-    #docBody :global(blockquote) {
-      border-left: 5px solid #fbbf24 !important;
-      background: rgba(71, 85, 105, 0.6) !important;
-      padding: 2rem 2.5rem !important;
-      margin: 2.5rem 0 !important;
-      border-radius: 1rem !important;
-      font-style: italic !important;
-      color: rgba(255, 255, 255, 0.95) !important;
-      box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.4) !important;
-    }
-
-    #docBody :global(blockquote *) {
-      color: rgba(255, 255, 255, 0.95) !important;
-    }
-
-    #docBody :global(blockquote p) {
-      margin-bottom: 0.75rem !important;
-    }
-
-    #docBody :global(ul),
-    #docBody :global(ol) {
-      color: rgba(255, 255, 255, 0.98) !important;
-      padding-left: 2.5rem !important;
-      margin: 2rem 0 !important;
-    }
-
-    #docBody :global(li) {
-      margin-bottom: 1.25rem !important;
-      line-height: 2.5rem !important;
-      color: rgba(255, 255, 255, 0.98) !important;
-      font-size: 1.2rem !important;
-    }
-
-    #docBody :global(li::marker) {
-      color: #fbbf24 !important;
-      font-weight: 700 !important;
-    }
-
-    #docBody :global(code) {
-      background: rgba(71, 85, 105, 0.8) !important;
-      color: #fde68a !important;
-      padding: 0.3rem 0.6rem !important;
-      border-radius: 0.5rem !important;
-      font-size: 1em !important;
-      border: 1px solid rgba(251, 191, 36, 0.3) !important;
-    }
-
-    #docBody :global(pre) {
-      background: rgba(30, 41, 59, 0.95) !important;
-      border: 2px solid rgba(251, 191, 36, 0.4) !important;
-      border-radius: 1rem !important;
-      padding: 2rem !important;
-      overflow-x: auto !important;
-      margin: 2.5rem 0 !important;
-    }
-
-    #docBody :global(pre code) {
-      background: transparent !important;
-      border: none !important;
-      padding: 0 !important;
-    }
-
-    #docBody :global(a) {
-      color: #60a5fa !important; /* blue-400 */
-      text-decoration: none !important;
-      transition: all 0.3s !important;
-      border-bottom: 2px solid transparent !important;
-      font-weight: 500 !important;
-    }
-
-    #docBody :global(a:hover) {
-      color: #93c5fd !important; /* blue-300 */
-      border-bottom-color: #93c5fd !important;
-    }
-
-    #docBody :global(hr) {
-      border: none !important;
-      border-top: 2px solid rgba(251, 191, 36, 0.4) !important;
-      margin: 3rem 0 !important;
-    }
-
-    #docBody :global(table) {
-      width: 100% !important;
-      border-collapse: collapse !important;
-      margin: 2.5rem 0 !important;
-    }
-
-    #docBody :global(th),
-    #docBody :global(td) {
-      border: 1px solid rgba(251, 191, 36, 0.3) !important;
-      padding: 1rem 1.5rem !important;
-      text-align: left !important;
-      color: rgba(255, 255, 255, 0.98) !important;
-    }
-
-    #docBody :global(th) {
-      background: rgba(251, 191, 36, 0.15) !important;
-      font-weight: 700 !important;
-      color: #fbbf24 !important;
-    }
-
-    #docBody :global(tr:hover) {
-      background: rgba(71, 85, 105, 0.3) !important;
-    }
-
-    /* Translation sections with smooth transitions */
-    #docBody :global(.devanagari-translation),
-    #docBody :global(.english-translation),
-    #docBody :global(.hindi-translation) {
-      animation: fadeIn 0.5s ease-in-out !important;
-      padding: 1.5rem 0 !important;
-    }
-
-    /* Verse numbering and special formatting */
-    #docBody :global(.verse-number) {
-      color: #fbbf24 !important;
-      font-weight: 700 !important;
-      margin-right: 0.75rem !important;
-      font-size: 1.1em !important;
-    }
-
-    /* Special dividers */
-    #docBody :global(.divider) {
-      margin: 3rem 0 !important;
-      text-align: center !important;
-      color: #fbbf24 !important;
-      font-size: 2rem !important;
-    }
-
-    /* Any div, span, or section should inherit bright color */
-    #docBody :global(div),
-    #docBody :global(span),
-    #docBody :global(section),
-    #docBody :global(article) {
-      color: rgba(255, 255, 255, 0.98) !important;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(-15px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Selection color - manuscript highlight */
-    #docBody ::selection {
-      background: rgba(139, 69, 19, 0.2) !important;
-      color: #2d1810 !important;
-    }
-  </style>
-
-  <!-- SVG Filter for Paper Texture -->
-  <svg style="position: absolute; width: 0; height: 0;">
-    <filter id="paper-texture">
-      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" result="noise" seed="2" />
-      <feDiffuseLighting in="noise" lighting-color="#f4e8d0" surfaceScale="1" result="diffLight">
-        <feDistantLight azimuth="45" elevation="60" />
-      </feDiffuseLighting>
-      <feComposite in="SourceGraphic" in2="diffLight" operator="arithmetic" k1="0.2" k2="0.8" k3="0.2" k4="0" />
-    </filter>
-  </svg>
+  
 
   <div class="parchment-paper">
     <div id="docBody" class="noto-sans-text prose prose-lg max-w-none">
