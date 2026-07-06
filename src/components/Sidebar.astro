@@ -1,0 +1,216 @@
+---
+import { getPublished } from "../utils/content";
+import { Tags } from "../utils/consts";
+
+interface Props {
+  currentSlug: string;
+  currentTags: string[];
+}
+
+const { currentSlug, currentTags } = Astro.props;
+
+const allPages = await getPublished("page");
+
+// Featured items (from any tag, excluding current)
+const featuredItems = allPages
+  .filter(p => p.data.featured && p.slug !== currentSlug)
+  .slice(0, 5);
+
+// Related items (same tag, excluding current)
+const relatedItems = allPages
+  .filter(p =>
+    p.slug !== currentSlug &&
+    p.data.tags?.some(t => currentTags.includes(t))
+  )
+  .slice(0, 5);
+
+// Tag descriptions
+const tagDescriptions: Record<string, string> = {
+  stotram: "Sacred Hymns",
+  stuti: "Devotional Prayers",
+  kavach: "Protective Mantras",
+  namavali: "Divine Names",
+  suktam: "Vedic Hymns",
+  vidhi: "Ritual Methods",
+};
+---
+
+<aside class="sidebar" aria-label="Related content">
+  <!-- Featured Items -->
+  {featuredItems.length > 0 && (
+    <div class="sidebar__section">
+      <h3 class="sidebar__heading">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        Featured
+      </h3>
+      <ul class="sidebar__list" role="list">
+        {featuredItems.map(item => (
+          <li>
+            <a href={`/page/${item.slug}`} class="sidebar__item">
+              <span class="sidebar__item-title" lang="hi">{item.data.titleDevanagri}</span>
+              <span class="sidebar__item-subtitle">{item.data.titleEnglish}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+
+  <!-- Related Items -->
+  {relatedItems.length > 0 && (
+    <div class="sidebar__section">
+      <h3 class="sidebar__heading">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+        Related
+      </h3>
+      <ul class="sidebar__list" role="list">
+        {relatedItems.map(item => (
+          <li>
+            <a href={`/page/${item.slug}`} class="sidebar__item">
+              <span class="sidebar__item-title" lang="hi">{item.data.titleDevanagri}</span>
+              <span class="sidebar__item-subtitle">{item.data.titleEnglish}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+
+  <!-- All Tags -->
+  <div class="sidebar__section">
+    <h3 class="sidebar__heading">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"></path><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle></svg>
+      Categories
+    </h3>
+    <div class="sidebar__tags">
+      {Tags.map(tag => (
+        <a href={`/tags/${tag}`} class:list={["sidebar__tag", { active: currentTags.includes(tag) }]}>
+          {tag.charAt(0).toUpperCase() + tag.slice(1)}
+          <span class="sidebar__tag-desc">{tagDescriptions[tag] || ""}</span>
+        </a>
+      ))}
+    </div>
+  </div>
+</aside>
+
+<style>
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .sidebar__section {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+  }
+
+  .sidebar__heading {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--gold-400);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .sidebar__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .sidebar__item {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    border: 1px solid transparent;
+  }
+
+  .sidebar__item:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-gold);
+  }
+
+  .sidebar__item-title {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--text-primary);
+    font-family: var(--font-devanagari);
+    line-height: var(--leading-normal);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .sidebar__item-subtitle {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    margin-top: 2px;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Tags */
+  .sidebar__tags {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .sidebar__tag {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+  }
+
+  .sidebar__tag:hover {
+    color: var(--gold-400);
+    background: rgba(212, 160, 23, 0.08);
+  }
+
+  .sidebar__tag.active {
+    color: var(--gold-400);
+    background: rgba(212, 160, 23, 0.12);
+  }
+
+  .sidebar__tag-desc {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+
+  /* Sticky on desktop */
+  @media (min-width: 1024px) {
+    .sidebar {
+      position: sticky;
+      top: calc(var(--nav-height) + var(--space-6));
+      max-height: calc(100vh - var(--nav-height) - var(--space-12));
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+  }
+</style>

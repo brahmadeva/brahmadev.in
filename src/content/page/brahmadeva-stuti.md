@@ -1,34 +1,40 @@
 ---
-titleDevanagri: "श्री ब्रह्मदेव स्तुतिः"
-titleEnglish: "Shri Brahmadev Stuti"
-description: "जिनका स्वरूप ध्यानियों के तमोगुणरूपी अन्धकार को नष्ट करता है, वाग्देवी सरस्वती जिनकी गृहिणी है, जिनके मुख से निःसृत वाणी ही चारों वेद हैं, जिनका यह समस्त चराचर विश्व कुटुम्ब (परिवार) है
-जिन्होंने अपने समग्र कार्य वेदों से प्रमाणित कर वेदों में प्रामाणिकता प्रदर्शित की, जिन्होंने केवल अपनी शक्ति के बल पर यथेच्छ सृष्टि रचना की, ऐसे अन्तरहित (अनन्त) देवाधिदेव भगवान् ब्रह्मा की हम स्तुति करते हैं ॥
-"
+titleDevanagri: श्री ब्रह्मदेव स्तुतिः
+titleEnglish: Shri Brahmadev Stuti
 
-sourceName: "Bramharchana Paddhati By Acharya Mrityunjay"
-sourceLink: "https://archive.org/details/LpiA_bramharchana-paddhati-by-acharya-mrityunjay-tripathi-jangamwadi-math-collection"
+description: Shri Brahmadev Stuti is a concise verse hymn dedicated to Lord Brahma.
+
+sourceName: Bramharchana Paddhati By Acharya Mrityunjay
+sourceLink: https://archive.org/details/LpiA_bramharchana-paddhati-by-acharya-mrityunjay-tripathi-jangamwadi-math-collection
 sourceDescription: ""
 extraInfo: ""
 
-availableLanguages: []
-tags: ["stuti", "brahma ji"]
+recitationMethod: <p>Being a single compact shloka, it may be recited from memory at the commencement of daily worship, scriptural study, or meditation upon the creator.</p> <p>Seated facing east in a clean space, the devotee may recite it with a calm mind, attentive to its meaning, ideally after invoking Brahma and Saraswati together.</p>
 
-pubDate: "Oct 17 2023"
+viniyog: <p>This verse is offered as an opening invocation (mangalacharana) to Lord Brahma. it should be recited at the beginning of Brahma worship and Vedic study to seek his grace over speech and knowledge.</p>
+
+availableScripts:
+  - devanagari
+  - iast
+
+tags:
+  - stuti
+  - brahma ji
+pubDate: Oct 17 2023
 heroImage: ""
----
-<div class="leading-10">
-<b>
-मूर्तिः स्मर्तृतमोहरा, सहचरी वाचां परा देवता,<br>
-व्याहाराः श्रुतयः कुटुम्बकमिदं विश्वं चरस्थावरम् ।<br>
-यस्यैतच्छुतिमूलमूलकतया सन्दर्शितप्रक्रियम्,<br>
-स्वारम्भं भगवन्तमन्तरहितं ब्रह्माणमीडामहे ॥<br>
-</b>
-</div>
+verses:
+  - role: verse
+    dev: "मूर्तिः स्मर्तृतमोहरा, सहचरी वाचां परा देवता,\n व्याहाराः श्रुतयः कुटुम्बकमिदं विश्वं चरस्थावरम् ।\nयस्यैतच्छुतिमूलमूलकतया सन्दर्शितप्रक्रियम्,\n स्वारम्भं भगवन्तमन्तरहितं ब्रह्माणमीडामहे ॥"
+    iast: "mūrtiḥ smartṛtamoharā, sahacarī vācāṃ parā devatā,\nvyāhārāḥ śrutayaḥ kuṭumbakamidaṃ viśvaṃ carasthāvaram |\nyasyaitacchutimūlamūlakatayā sandarśitaprakriyam,\nsvārambhaṃ bhagavantamantarahitaṃ brahmāṇamīḍāmahe ||"
 
-<br/>
-<div  class="leading-10">
-जिनका स्वरूप ध्यानियों के तमोगुणरूपी अन्धकार को नष्ट करता है, वाग्देवी सरस्वती जिनकी गृहिणी है, <br>जिनके मुख से निःसृत वाणी ही चारों वेद हैं, जिनका यह समस्त चराचर विश्व कुटुम्ब (परिवार) है,<br> जिन्होंने अपने समग्र कार्य वेदों से प्रमाणित कर वेदों में प्रामाणिकता प्रदर्शित की,<br> जिन्होंने केवल अपनी शक्ति के बल पर यथेच्छ सृष्टि रचना की,<br> ऐसे अन्तरहित (अनन्त) देवाधिदेव भगवान् ब्रह्मा की हम स्तुति करते हैं ॥<br/>
-</div>
+
+---
+
+<b>जिनका स्वरूप ध्यानियों के तमोगुणरूपी अन्धकार को नष्ट करता है, वाग्देवी सरस्वती जिनकी गृहिणी है,<br/>
+जिनके मुख से निःसृत वाणी ही चारों वेद हैं, जिनका यह समस्त चराचर विश्व कुटुम्ब (परिवार) है,<br/>
+जिन्होंने अपने समग्र कार्य वेदों से प्रमाणित कर वेदों में प्रामाणिकता प्रदर्शित की,<br/>
+जिन्होंने केवल अपनी शक्ति के बल पर यथेच्छ सृष्टि रचना की,<br/>
+ऐसे अन्तरहित (अनन्त) देवाधिदेव भगवान् ब्रह्मा की हम स्तुति करते हैं ॥</b>
 
 <br/>
 

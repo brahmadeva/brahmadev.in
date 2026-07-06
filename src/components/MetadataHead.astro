@@ -1,3 +1,7 @@
+---
+import "../styles/global.css";
+---
+
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 
@@ -45,66 +49,168 @@
   gtag("config", "G-XEMZGG6H2H");
 </script>
 
+<script is:inline>
+  // Mark that JS is available so scroll-reveal start-states only apply with JS.
+  document.documentElement.classList.add('js');
+
+  // Theme init — runs before first paint to avoid a flash of the wrong theme.
+  // If the user has manually toggled before, honour that saved choice;
+  // otherwise fall back to the device's OS-level light/dark preference.
+  const theme = (() => {
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+      return localStorage.getItem('theme');
+    }
+    if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+      return 'light';
+    }
+    return 'dark';
+  })();
+
+  if (theme === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+  }
+
+  window.localStorage.setItem('theme', theme);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const themeBtns = [
+      document.getElementById('theme-toggle-desktop'),
+      document.getElementById('theme-toggle-mobile'),
+    ].filter(Boolean);
+
+    const syncButtons = () => {
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      themeBtns.forEach((btn) => {
+        // aria-pressed reflects "light theme active"; label states the action.
+        btn.setAttribute('aria-pressed', String(isLight));
+        btn.setAttribute('aria-label', isLight ? 'Switch to dark theme' : 'Switch to light theme');
+      });
+    };
+
+    const handleToggleClick = () => {
+      const element = document.documentElement;
+      const isLight = element.getAttribute('data-theme') === 'light';
+
+      if (isLight) {
+        element.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        element.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+      }
+      syncButtons();
+    };
+
+    themeBtns.forEach((btn) => btn.addEventListener('click', handleToggleClick));
+    syncButtons();
+  });
+</script>
+
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    const modal = document.getElementById("search-modal") as HTMLElement;
-    const openBtnDesktop = document.getElementById("open-modal-btn") as HTMLElement;
-    const openBtnMobile = document.getElementById("open-modal-btn-mobile") as HTMLElement;
-    const closeBtn = document.getElementById("close-modal-btn") as HTMLElement;
-    const searchInput = document.getElementById("search-input") as HTMLInputElement;
-    const searchBtn = document.getElementById("search-btn") as HTMLElement;
+    const modal = document.getElementById("search-modal") as HTMLElement | null;
+    const panel = modal?.querySelector(".search-modal__panel") as HTMLElement | null;
+    const searchInput = document.getElementById("search-input") as HTMLInputElement | null;
+    const openBtns = [
+      document.getElementById("open-modal-btn"),
+      document.getElementById("open-modal-btn-mobile"),
+    ].filter((el): el is HTMLElement => el !== null);
 
+    if (!modal || !panel || !searchInput) return;
 
-    const onBtnClick = () => {
-      modal.classList.remove("hidden");
-      modal.classList.add("flex");
-      setTimeout(() => {
-        modal.classList.add("opacity-100");
-        modal.classList.remove("opacity-0");
-      }, 10); // Small delay to trigger animation
-      searchInput.focus();
-    }
+    let lastFocused: HTMLElement | null = null;
 
-    // Open the modal
-    openBtnDesktop.addEventListener("click",onBtnClick);
-    openBtnMobile.addEventListener("click",onBtnClick);
+    const getFocusable = (): HTMLElement[] =>
+      Array.from(
+        panel.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter((el) => el.offsetParent !== null);
 
+    const trapFocus = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
+      const focusable = getFocusable();
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
 
-    // Close the modal
-    closeBtn.addEventListener("click", () => {
-      closeModal();
-    });
+    const openModal = () => {
+      lastFocused = document.activeElement as HTMLElement | null;
+      modal.classList.add("is-open");
+      modal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      requestAnimationFrame(() => searchInput.focus());
+      document.addEventListener("keydown", trapFocus);
+    };
 
-    window.addEventListener("keydown", (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+    const closeModal = () => {
+      modal.classList.remove("is-open");
+      modal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", trapFocus);
+      lastFocused?.focus();
+    };
+
+    openBtns.forEach((btn) => btn.addEventListener("click", openModal));
+
+    // Backdrop and close button both carry data-search-close
+    modal.querySelectorAll("[data-search-close]").forEach((el) =>
+      el.addEventListener("click", closeModal)
+    );
+
+    document.addEventListener("keydown", (event: KeyboardEvent) => {
+      if (event.key === "Escape" && modal.classList.contains("is-open")) {
         closeModal();
       }
-    });
-
-    // Perform search
-    searchBtn.addEventListener("click", () => {
-      performSearch(searchInput.value);
-    });
-
-    searchInput.addEventListener("keydown", (event: KeyboardEvent) => {
-      if (event.key === "Enter") {
-        performSearch(searchInput.value);
+      // Ctrl/Cmd+K opens or closes search
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        if (modal.classList.contains("is-open")) {
+          closeModal();
+        } else {
+          openModal();
+        }
       }
     });
+  });
+</script>
 
-    function closeModal() {
-      modal.classList.remove("opacity-100");
-      modal.classList.add("opacity-0");
-      setTimeout(() => {
-        modal.classList.add("hidden");
-        modal.classList.remove("flex");
-      }, 300); // Match this with the transition duration
+<script>
+  // Scroll reveal: add `.visible` to `.fade-in-on-scroll` elements as they enter view.
+  document.addEventListener("DOMContentLoaded", () => {
+    const els = Array.from(
+      document.querySelectorAll<HTMLElement>(".fade-in-on-scroll")
+    );
+    if (els.length === 0) return;
+
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced || !("IntersectionObserver" in window)) {
+      els.forEach((el) => el.classList.add("visible"));
+      return;
     }
 
-    function performSearch(query: string) {
-      const site = "brahmadev.in"; // Replace with your website
-      const searchUrl = `https://www.google.com/search?q=site:${site}+${query}`;
-      window.open(searchUrl, "_blank");
-    }
+    const observer = new IntersectionObserver(
+      (entries, obs) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            obs.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
+    );
+
+    els.forEach((el) => observer.observe(el));
   });
 </script>

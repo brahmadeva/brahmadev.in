@@ -1,6 +1,7 @@
 ---
 import Topbar from "../../components/Topbar.astro";
 import Footer from "../../components/Footer.astro";
+import Breadcrumb from "../../components/Breadcrumb.astro";
 import RecentCards from "../../components/RecentCards.astro";
 import MetadataHead from "../../components/MetadataHead.astro";
 import {
@@ -9,14 +10,14 @@ import {
   SITE_TITLE_DEVANAGRI,
   Tags,
 } from "../../utils/consts";
-import { getCollection } from "astro:content";
+import { getPublished } from "../../utils/content";
 import SearchModal from "../../components/SearchModal.astro";
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const ogSiteName = `${SITE_TITLE_DEVANAGRI} ${SITE_TITLE_SEPARATOR} ${SITE_TITLE}`;
-const pageName = `Tags ${SITE_TITLE_SEPARATOR} ${ogSiteName}`;
+const pageName = `All Scriptures ${SITE_TITLE_SEPARATOR} ${ogSiteName}`;
 
-const pages = (await getCollection("page")).sort(
+const pages = (await getPublished("page")).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
 
@@ -25,6 +26,15 @@ const checkItem = (postTags: any[], tagSection: any): boolean => {
     if (Tags.includes(postTag) && postTag == tagSection) return true;
   }
   return false;
+};
+
+const tagDescriptions: Record<string, string> = {
+  stotram: "Sacred hymns of praise and devotion",
+  stuti: "Devotional prayers and eulogies",
+  kavach: "Protective mantras and armor prayers",
+  namavali: "Collections of divine names",
+  suktam: "Vedic hymns and sacred verses",
+  vidhi: "Ritual procedures and worship methods",
 };
 
 const ldSchema = {
@@ -50,104 +60,209 @@ const ldSchema = {
 <html lang="en">
   <head>
     <MetadataHead />
-
     <link rel="canonical" href={canonicalURL} />
     <title>{pageName}</title>
     <meta property="og:type" content="website" />
     <meta property="og:url" content={Astro.url} />
     <meta property="og:title" content={pageName} />
     <meta property="og:site_name" content={ogSiteName} />
-
-    <script type="application/ld+json" set:html={JSON.stringify(ldSchema)}>
-    </script>
-    
+    <script type="application/ld+json" set:html={JSON.stringify(ldSchema)}></script>
   </head>
 
-  <body class="bg-gray-900 min-h-screen">
+  <body>
     <Topbar />
     <SearchModal />
 
-    <!-- Hero Section -->
-    <div class="relative pt-24 pb-12 bg-gradient-to-b from-gray-900 via-slate-900 to-gray-800">
-      <div class="max-w-7xl mx-auto px-4">
-        <div class="text-center mb-8">
-          <h1 class="text-4xl md:text-5xl font-bold text-yellow-400 mb-3">
-            Browse by Tags
-          </h1>
-          <p class="text-white/70 text-lg max-w-2xl mx-auto">
-            Explore our collection organized by topics and themes
-          </p>
-        </div>
+    <main id="main-content" class="tags-page">
+      <!-- Hero -->
+      <div class="tags-page__hero">
+        <div class="tags-page__hero-inner">
+          <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "All Scriptures" }]} />
+          <h1 class="tags-page__title">Browse All Scriptures</h1>
+          <p class="tags-page__subtitle" lang="hi">सभी ग्रंथ देखें</p>
+          <p class="tags-page__desc">Explore our complete collection organized by sacred categories</p>
 
-        <!-- Tag Summary Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto mb-8">
-          {
-            Tags.map((tag) => {
-              const myPages = pages.filter((post: any) =>
-                checkItem(post.data.tags, tag)
-              );
-              if (myPages.length == 0) return null;
+          <!-- Category Quick Links -->
+          <div class="tags-page__chips">
+            {Tags.map((tag) => {
+              const myPages = pages.filter((post: any) => checkItem(post.data.tags, tag));
+              if (myPages.length === 0) return null;
               return (
-                <a
-                  href={`/tags/${tag}`}
-                  class="group bg-slate-800/60 backdrop-blur-sm rounded-xl p-6 border border-slate-700 
-                         hover:border-yellow-400/40 transition-all duration-300 hover:scale-105"
-                >
-                  <div class="flex items-center justify-between">
-                    <h3 class="text-xl font-semibold text-white capitalize group-hover:text-yellow-400 transition-colors">
-                      {tag}
-                    </h3>
-                    <span class="bg-yellow-400/20 text-yellow-400 rounded-full px-3 py-1 text-sm font-bold">
-                      {myPages.length}
-                    </span>
-                  </div>
-                  <p class="text-white/60 text-sm mt-2">
-                    {myPages.length}&nbsp;{myPages.length === 1 ? 'item' : 'items'}
-                  </p>
+                <a href={`#${tag}`} class="tags-page__chip">
+                  <span class="tags-page__chip-name">{tag.charAt(0).toUpperCase() + tag.slice(1)}</span>
+                  <span class="tags-page__chip-count">{myPages.length}</span>
                 </a>
               );
-            })
-          }
+            })}
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Content Section -->
-    <div class="bg-gray-900 py-12">
-      <div class="max-w-7xl mx-auto px-4">
-        {
-          Tags.map((tag) => {
-            const myPages = pages.filter((post: any) =>
-              checkItem(post.data.tags, tag)
-            );
-            if (myPages.length == 0) return null;
-            else return (
-              <div class="mb-16" id={tag}>
-                <div class="flex items-center justify-between mb-6">
-                  <h2 class="text-3xl font-bold text-yellow-400 capitalize flex items-center gap-3">
-                    <span class="text-yellow-400">#</span>
-                    {tag}
+      <!-- Category Sections -->
+      <div class="tags-page__sections">
+        {Tags.map((tag) => {
+          const myPages = pages.filter((post: any) => checkItem(post.data.tags, tag));
+          if (myPages.length === 0) return null;
+          return (
+            <section class="tags-page__section" id={tag}>
+              <div class="tags-page__section-header">
+                <div class="tags-page__section-info">
+                  <h2 class="tags-page__section-title">
+                    {tag.charAt(0).toUpperCase() + tag.slice(1)}
                   </h2>
-                  <a
-                    href={`/tags/${tag}`}
-                    class="text-white/70 hover:text-yellow-400 text-sm font-medium transition-colors
-                           flex items-center gap-2"
-                  >
-                    View all
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                    </svg>
-                  </a>
+                  <p class="tags-page__section-desc">{tagDescriptions[tag]}</p>
                 </div>
-                <RecentCards pages={myPages} />
-                <hr class="border-slate-700 mt-12" />
+                <a href={`/tags/${tag}`} class="tags-page__section-link">
+                  View all
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                </a>
               </div>
-            );
-          })
-        }
+              <RecentCards pages={myPages} />
+            </section>
+          );
+        })}
       </div>
-    </div>
+    </main>
 
     <Footer />
   </body>
 </html>
+
+<style>
+  .tags-page {
+    padding-top: var(--nav-height);
+  }
+
+  /* Hero */
+  .tags-page__hero {
+    background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: var(--space-8) var(--space-4) var(--space-10);
+  }
+
+  .tags-page__hero-inner {
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+  }
+
+  .tags-page__title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-1);
+  }
+
+  .tags-page__subtitle {
+    font-size: var(--text-lg);
+    color: var(--gold-400);
+    font-family: var(--font-devanagari);
+    margin-bottom: var(--space-3);
+  }
+
+  .tags-page__desc {
+    font-size: var(--text-base);
+    color: var(--text-muted);
+    margin-bottom: var(--space-6);
+  }
+
+  /* Chips */
+  .tags-page__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .tags-page__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-full);
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    transition: all var(--transition-fast);
+  }
+
+  .tags-page__chip:hover {
+    border-color: var(--border-gold);
+    color: var(--gold-400);
+    background: rgba(212, 160, 23, 0.08);
+  }
+
+  .tags-page__chip-count {
+    font-size: var(--text-xs);
+    background: var(--surface-hover);
+    padding: 1px 8px;
+    border-radius: var(--radius-full);
+    color: var(--text-muted);
+  }
+
+  /* Sections */
+  .tags-page__sections {
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    padding: var(--space-10) var(--space-4);
+  }
+
+  .tags-page__section {
+    margin-bottom: var(--space-16);
+  }
+
+  .tags-page__section:not(:last-child) {
+    padding-bottom: var(--space-16);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .tags-page__section-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: var(--space-6);
+  }
+
+  .tags-page__section-title {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--gold-400);
+  }
+
+  .tags-page__section-desc {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin-top: var(--space-1);
+  }
+
+  .tags-page__section-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+    white-space: nowrap;
+  }
+
+  .tags-page__section-link:hover {
+    color: var(--gold-400);
+  }
+
+  @media (min-width: 640px) {
+    .tags-page__title {
+      font-size: var(--text-4xl);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .tags-page__section-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-3);
+    }
+  }
+</style>

@@ -1,25 +1,25 @@
 ---
-import { type CollectionEntry, getCollection } from "astro:content";
+import { type CollectionEntry } from "astro:content";
+import { getPublished } from "../../utils/content";
 import Topbar from "../../components/Topbar.astro";
 import Footer from "../../components/Footer.astro";
+import Breadcrumb from "../../components/Breadcrumb.astro";
+import Sidebar from "../../components/Sidebar.astro";
+import InfoAccordion from "../../components/InfoAccordion.astro";
 
 import {
   SITE_TITLE_SEPARATOR,
   SITE_TITLE,
   SITE_TITLE_DEVANAGRI,
-  SITE_DESCRIPTION,
-  SITE_DESCRIPTION_DEVANAGRI,
   DEFAULT_ARTICLE_IMAGE,
   Tags,
-  Languages,
 } from "../../utils/consts";
 import MetadataHead from "../../components/MetadataHead.astro";
 import ArticleBody from "../../components/ArticleBody.astro";
 import SearchModal from "../../components/SearchModal.astro";
 
 export async function getStaticPaths() {
-  // IMP NOTE: this genrates the dynamic paths for the current route
-  const pages = await getCollection("page");
+  const pages = await getPublished("page");
   return pages.map((post) => ({
     params: { slug: post.slug },
     props: post,
@@ -29,19 +29,14 @@ export async function getStaticPaths() {
 type Props = CollectionEntry<"page">;
 
 const post = Astro.props;
-
 const { Content } = await post.render();
-
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
-const { titleDevanagri, titleEnglish, description, heroImage, pubDate, tags } =
-  post.data;
+const { titleDevanagri, titleEnglish, description, heroImage, pubDate, tags } = post.data;
 
 const ogSiteName = `${SITE_TITLE_DEVANAGRI} ${SITE_TITLE_SEPARATOR} ${SITE_TITLE}`;
-
 const postTitleEnglish = `${titleEnglish} ${SITE_TITLE_SEPARATOR} ${SITE_TITLE}`;
 const postTitleDevanagri = `${titleDevanagri} ${SITE_TITLE_SEPARATOR} ${SITE_TITLE_DEVANAGRI}`;
-
 const postTitleCombined = `${titleDevanagri} ${SITE_TITLE_SEPARATOR} ${titleEnglish} ${SITE_TITLE_SEPARATOR} ${SITE_TITLE_DEVANAGRI} ${SITE_TITLE_SEPARATOR} ${SITE_TITLE}`;
 const postDesciptionCombined = description;
 
@@ -49,6 +44,55 @@ const finalHeroImage = new URL(
   heroImage ? heroImage : DEFAULT_ARTICLE_IMAGE,
   Astro.url
 );
+
+// Build breadcrumb
+const primaryTag = tags?.find(t => Tags.includes(t));
+const breadcrumbItems = [
+  { label: "Home", href: "/" },
+  ...(primaryTag ? [{ label: primaryTag.charAt(0).toUpperCase() + primaryTag.slice(1), href: `/tags/${primaryTag}` }] : []),
+  { label: titleEnglish },
+];
+
+// Build info accordion sections
+const infoSections = [
+  post.data.significance && {
+    icon: "significance",
+    titleEn: "Significance",
+    titleHi: "महत्व",
+    content: post.data.significance,
+    open: true,
+  },
+  post.data.benefits && {
+    icon: "benefits",
+    titleEn: "Benefits of Reciting",
+    titleHi: "पाठ के लाभ",
+    content: post.data.benefits,
+  },
+  post.data.recitationMethod && {
+    icon: "recitation",
+    titleEn: "How to Recite",
+    titleHi: "पाठ विधि",
+    content: post.data.recitationMethod,
+  },
+  post.data.viniyog && {
+    icon: "viniyog",
+    titleEn: "Viniyog",
+    titleHi: "विनियोग",
+    content: post.data.viniyog,
+  },
+  (post.data.sourceName || post.data.sourceDescription || post.data.sourceLink || post.data.extraInfo) && {
+    icon: "source",
+    titleEn: "Sources & References",
+    titleHi: "स्रोत एवं संदर्भ",
+    content: [
+      post.data.sourceName ? `<p><strong>Source:</strong> ${post.data.sourceName}</p>` : '',
+      post.data.sourceDescription ? `<p>${post.data.sourceDescription}</p>` : '',
+      post.data.sourceLink ? `<p><strong>Reference:</strong> <a href="${post.data.sourceLink}" target="_blank" rel="noopener noreferrer">${post.data.sourceLink.length > 60 ? post.data.sourceLink.substring(0, 60) + '...' : post.data.sourceLink}</a></p>` : '',
+      post.data.extraInfo ? `<p>${post.data.extraInfo}</p>` : '',
+    ].filter(Boolean).join(''),
+    open: true,
+  },
+].filter((s): s is Exclude<typeof s, "" | undefined | 0 | false | null> => Boolean(s));
 
 const ldSchema = {
   "@context": "https://schema.org",
@@ -82,7 +126,6 @@ const ldSchema = {
 
     <meta name="title" lang="en" content={postTitleEnglish} />
     <meta name="description" lang="en" content={description} />
-
     <meta name="title" lang="hi" content={postTitleDevanagri} />
     <meta name="description" lang="hi" content={description} />
 
@@ -92,17 +135,8 @@ const ldSchema = {
     <meta property="og:title" content={postTitleCombined} />
     <meta property="og:site_name" content={ogSiteName} />
     <meta property="og:description" content={postDesciptionCombined} />
-
-    <meta property="og:site_name:locale" content="en_IN" />
-    <meta property="og:site_name:locale:alternate" content="hi_IN" />
-    <meta property="og:site_name:locale:alternate" content="hi" />
-    <meta property="og:site_name:locale:alternate" content="en" />
-
     <meta property="og:locale" content="en_IN" />
     <meta property="og:locale:alternate" content="hi_IN" />
-    <meta property="og:locale:alternate" content="hi" />
-    <meta property="og:locale:alternate" content="en" />
-
     <meta property="og:image" content={finalHeroImage} />
 
     <!-- Twitter -->
@@ -111,27 +145,8 @@ const ldSchema = {
     <meta property="twitter:title" content={postTitleCombined} />
     <meta property="twitter:description" content={postDesciptionCombined} />
     <meta property="twitter:image" content={finalHeroImage} />
-    <meta property="twitter:site" content={"https://brahmadev.in"} />
 
-    <style>
-      .m_title {
-        display: inline-block;
-      }
-      .m_title:first-letter {
-        text-transform: uppercase;
-      }
-
-      .noto-sans-text {
-        font-family: "Noto Sans", sans-serif;
-        font-optical-sizing: auto;
-        font-weight: 300;
-        font-style: normal;
-        font-variation-settings: "wdth" 100;
-      }
-    </style>
-
-    <script type="application/ld+json" set:html={JSON.stringify(ldSchema)}>
-    </script>
+    <script type="application/ld+json" set:html={JSON.stringify(ldSchema)}></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -141,128 +156,164 @@ const ldSchema = {
         const downloadBtn = document.getElementById('download-pdf-btn');
         if (downloadBtn) {
           downloadBtn.addEventListener('click', async () => {
-            // Show loading state
             const originalText = downloadBtn.innerHTML;
             downloadBtn.innerHTML = `
-              <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              <svg class="spin-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+                <circle opacity="0.25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path opacity="0.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
               <span>Generating PDF...</span>
             `;
             downloadBtn.disabled = true;
-
             try {
               const { jsPDF } = window.jspdf;
-              const doc = new jsPDF('p', 'mm', 'a4');
-              
-              // Get the visible content
               const docBody = document.getElementById('docBody');
-              if (!docBody) {
-                throw new Error('Content not found');
-              }
-              
-              // Create a temporary container with white background
+              if (!docBody) throw new Error('Content not found');
+
               const container = document.createElement('div');
-              container.style.cssText = `
-                position: absolute;
-                left: -9999px;
-                width: 800px;
-                background: white;
-                padding: 40px;
-                font-family: 'Noto Sans', sans-serif;
-                color: #000;
-              `;
+              container.id = 'pdf-export-root';
+              container.style.cssText = 'position:absolute;left:-9999px;width:800px;background:white;padding:32px 36px;font-family:"Noto Sans Devanagari","Noto Sans",sans-serif;color:#000;';
               document.body.appendChild(container);
-              
-              // Add title section
+
+              // PDF-only overrides: tighten the screen layout's generous
+              // spacing and swap decorative chrome for a quieter print look.
+              const pdfStyles = document.createElement('style');
+              pdfStyles.textContent = `
+                #pdf-export-root #docBody p { margin-bottom: 0.9rem !important; line-height: 1.95 !important; }
+                #pdf-export-root #docBody h1, #pdf-export-root #docBody h2,
+                #pdf-export-root #docBody h3, #pdf-export-root #docBody h4 {
+                  margin-top: 1.4rem !important; margin-bottom: 0.8rem !important;
+                }
+                #pdf-export-root #docBody .verse { padding: 0.85rem 0 !important; border-bottom: 1px solid #ece1c6 !important; }
+                #pdf-export-root #docBody .verse:last-child,
+                #pdf-export-root #docBody .verse--colophon { border-bottom: none !important; }
+                #pdf-export-root #docBody .verse__script { font-size: 1.3rem !important; line-height: 1.9 !important; }
+                #pdf-export-root #docBody .verse__meaning { margin-top: 0.5rem !important; }
+                #pdf-export-root #docBody .verse__trans {
+                  background: transparent !important;
+                  border-left: 2px solid #d8c9a8 !important;
+                  border-radius: 0 !important;
+                  padding: 0.15rem 0 0.15rem 1rem !important;
+                  font-size: 0.95rem !important;
+                  line-height: 1.8 !important;
+                }
+                #pdf-export-root #docBody .translation { margin: 0.4rem 0 0.9rem !important; line-height: 1.85 !important; }
+                #pdf-export-root #docBody .sanskrit-shlok { padding: 0.3rem 0 !important; margin-bottom: 0.9rem !important; }
+              `;
+              container.appendChild(pdfStyles);
+
+              // Minimal title block: site mark, titles, short rule
+              const plainDescription = description ? description.replace(/<[^>]*>/g, '') : '';
               const titleSection = document.createElement('div');
               titleSection.innerHTML = `
-                <div style="text-align: center; margin-bottom: 30px; color: #000;">
-                  <h1 style="font-size: 28px; font-weight: bold; margin-bottom: 15px; color: #000; font-family: 'Noto Sans', sans-serif;">${titleDevanagri || ''}</h1>
-                  <h2 style="font-size: 20px; margin-bottom: 15px; color: #000; font-family: 'Noto Sans', sans-serif;">${titleEnglish || ''}</h2>
-                  ${description ? `<p style="font-size: 14px; margin-top: 15px; color: #333; font-family: 'Noto Sans', sans-serif;">${description.replace(/<[^>]*>/g, '')}</p>` : ''}
-                  <hr style="border: 1px solid #8b4513; margin: 20px 0;">
+                <div style="text-align:center;margin-bottom:34px;">
+                  <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#8b5922;margin-bottom:20px;">www.brahmadev.in</div>
+                  <h1 style="font-size:27px;font-weight:700;margin:0 0 8px;color:#1a1a1a;line-height:1.45;">${titleDevanagri || ''}</h1>
+                  <h2 style="font-size:15px;font-weight:500;margin:0;color:#555;line-height:1.5;">${titleEnglish || ''}</h2>
+                  <div style="height:1px;background:linear-gradient(90deg,transparent,#c9a86a,transparent);width:280px;margin:22px auto;"></div>
+                  ${plainDescription ? `<p style="font-size:13.5px;font-style:italic;line-height:1.8;color:#6f6a60;max-width:580px;margin:0 auto;">${plainDescription}</p>` : ''}
                 </div>
               `;
               container.appendChild(titleSection);
-              
-              // Clone content - but filter hidden elements from the original docBody
+
               const contentClone = docBody.cloneNode(true);
-              
-              // Remove elements that are hidden in the original DOM
+              contentClone.style.setProperty('--reader-scale', '1');
               const clonedElements = contentClone.querySelectorAll('*');
+              const originalElements = docBody.querySelectorAll('*');
               clonedElements.forEach((clonedEl, index) => {
-                // Find corresponding element in original DOM
-                const originalElements = docBody.querySelectorAll('*');
                 const originalEl = originalElements[index];
-                
                 if (originalEl) {
-                  const computedStyle = window.getComputedStyle(originalEl);
-                  // Remove if hidden in original
-                  if (computedStyle.display === 'none' || originalEl.offsetParent === null) {
+                  const cs = window.getComputedStyle(originalEl);
+                  if (cs.display === 'none' || originalEl.offsetParent === null) {
                     clonedEl.remove();
                     return;
                   }
                 }
-                
-                // Force all visible text to be 100% black with !important
                 clonedEl.style.setProperty('color', '#000000', 'important');
                 clonedEl.style.setProperty('background-color', 'transparent', 'important');
                 clonedEl.style.setProperty('opacity', '1', 'important');
                 clonedEl.style.setProperty('visibility', 'visible', 'important');
-                clonedEl.style.display = '';
               });
-              
-              // Also force black on text nodes by wrapping in spans
-              const allTextElements = contentClone.querySelectorAll('p, h1, h2, h3, h4, h5, h6, li, span, div, td, th, a, strong, em, b, i');
-              allTextElements.forEach(el => {
-                el.style.setProperty('color', '#000000', 'important');
-                el.style.setProperty('opacity', '1', 'important');
-              });
-              
+              // Strip interactive controls (script/translation toggles etc.)
+              contentClone.querySelectorAll('button, [role="toolbar"]').forEach((el) => el.remove());
               container.appendChild(contentClone);
-              
-              // Wait for fonts to load
+
               await document.fonts.ready;
-              await new Promise(resolve => setTimeout(resolve, 300));
-              
-              // Convert to canvas
+              await new Promise(r => setTimeout(r, 300));
+
               const canvas = await html2canvas(container, {
-                scale: 2,
-                useCORS: true,
-                backgroundColor: '#ffffff',
-                logging: false,
-                windowWidth: 800
+                scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false, windowWidth: 800
               });
-              
-              // Clean up temp container
               document.body.removeChild(container);
-              
-              // Create a single long page PDF that fits all content
-              const imgData = canvas.toDataURL('image/png', 1.0);
-              
-              const imgWidth = 210; // A4 width in mm
-              const imgHeight = (canvas.height * imgWidth) / canvas.width;
-              
-              // Create PDF with custom height to fit all content
-              const _doc = new jsPDF({
-                orientation: 'portrait',
-                unit: 'mm',
-                format: [imgWidth, imgHeight]
+
+              // --- Paginate onto proper A4 pages ---
+              const pageW = 210, pageH = 297;
+              const margin = { top: 14, bottom: 16, left: 14, right: 14 };
+              const contentW = pageW - margin.left - margin.right;
+              const pxPerMm = canvas.width / contentW;
+              const pageContentPx = Math.floor((pageH - margin.top - margin.bottom) * pxPerMm);
+
+              // Prefer cutting pages at blank rows so text lines aren't sliced.
+              const srcCtx = canvas.getContext('2d');
+              const isBlankRow = (y) => {
+                const row = srcCtx.getImageData(0, y, canvas.width, 1).data;
+                for (let i = 0; i < row.length; i += 40) {
+                  if (row[i] < 245 || row[i + 1] < 245 || row[i + 2] < 245) return false;
+                }
+                return true;
+              };
+              const cuts = [];
+              let yPx = 0;
+              while (yPx < canvas.height) {
+                let end = Math.min(yPx + pageContentPx, canvas.height);
+                if (end < canvas.height) {
+                  const searchLimit = end - Math.min(400, Math.floor(pageContentPx * 0.25));
+                  for (let k = end; k > searchLimit; k--) {
+                    if (isBlankRow(k)) { end = k; break; }
+                  }
+                }
+                if (end <= yPx) end = Math.min(yPx + pageContentPx, canvas.height);
+                cuts.push([yPx, end]);
+                yPx = end;
+              }
+
+              const _doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+              _doc.setProperties({
+                title: `${titleEnglish || titleDevanagri || ''}`,
+                subject: plainDescription,
+                author: 'brahmadev.in',
+                creator: 'brahmadev.in',
               });
-              
-              // Add the entire image as one page
-              _doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-              
-              const filename = `${(titleDevanagri || titleEnglish || 'document').replace(/[/\\?%*:|"<>]/g, '-')}.pdf`;
-              _doc.save(filename);
-              
+
+              cuts.forEach(([start, end], i) => {
+                if (i > 0) _doc.addPage();
+                const sliceH = end - start;
+                const pageCanvas = document.createElement('canvas');
+                pageCanvas.width = canvas.width;
+                pageCanvas.height = sliceH;
+                const pctx = pageCanvas.getContext('2d');
+                pctx.fillStyle = '#ffffff';
+                pctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+                pctx.drawImage(canvas, 0, start, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+                _doc.addImage(pageCanvas.toDataURL('image/jpeg', 0.92), 'JPEG', margin.left, margin.top, contentW, sliceH / pxPerMm);
+
+                // Minimal footer: site left, page number right
+                _doc.setFont('helvetica', 'normal');
+                _doc.setFontSize(8);
+                _doc.setTextColor(150);
+                _doc.text('https://www.brahmadev.in', margin.left, pageH - 8);
+                if (cuts.length > 1) {
+                  _doc.text(`${i + 1} / ${cuts.length}`, pageW - margin.right, pageH - 8, { align: 'right' });
+                }
+              });
+
+              const safeTitle = (titleEnglish || titleDevanagri || 'document')
+                .replace(/[/\\?%*:|"<>]/g, '-').replace(/\s+/g, ' ').trim();
+              _doc.save(`${safeTitle}.pdf`);
             } catch (error) {
               console.error('Error generating PDF:', error);
               alert('Failed to generate PDF: ' + error.message);
             } finally {
-              // Restore button state
               downloadBtn.innerHTML = originalText;
               downloadBtn.disabled = false;
             }
@@ -270,198 +321,80 @@ const ldSchema = {
         }
       });
     </script>
-    
   </head>
 
-  <body class="bg-gray-900 min-h-screen">
+  <body>
     <Topbar />
     <SearchModal />
 
-    <!-- Hero Section with Background -->
-    <div class="relative pt-20 pb-8 bg-gradient-to-b from-gray-900 via-slate-900 to-gray-800">
-      <div class="max-w-5xl mx-auto px-4">
-        <!-- Tags -->
-        <div class="flex flex-wrap justify-center gap-2 mb-6">
-          {
-            post.data?.tags?.map((tag: any) =>
+    <main id="main-content" class="content-page">
+      <!-- Hero / Title Section -->
+      <div class="content-page__hero">
+        <div class="content-page__hero-inner">
+          <Breadcrumb items={breadcrumbItems} />
+
+          <!-- Tags -->
+          <div class="content-page__tags">
+            {post.data?.tags?.map((tag: string) =>
               Tags.includes(tag) ? (
-                <a
-                  href={`/tags/${tag}`}
-                  class="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 
-                         rounded-full px-4 py-1.5 text-sm font-semibold text-white transition-all duration-300 
-                         hover:scale-105 shadow-lg"
-                >
-                  #{tag}
+                <a href={`/tags/${tag}`} class="content-page__tag">
+                  {tag.charAt(0).toUpperCase() + tag.slice(1)}
                 </a>
               ) : (
-                <span
-                  class="bg-gradient-to-r from-orange-500 to-red-500 rounded-full px-4 py-1.5 
-                         text-sm font-semibold text-white shadow-lg"
-                >
-                  #{tag}
+                <span class="content-page__tag content-page__tag--plain">
+                  {tag}
                 </span>
               )
-            )
-          }
-        </div>
-
-        <!-- Title Section -->
-        <div class="text-center mb-8">
-          <h1
-          style="font-weight: 500;"
-          class="text-3xl md:text-5xl
-          font-bold
-          text-yellow-400 font-serif mb-3 noto-sans-text">
-            {titleDevanagri}
-          </h1>
-          <h2 class="text-xl md:text-2xl text-white/90 font-medium">
-            {titleEnglish}
-          </h2>
-          {description && (
-            <p class="text-white/70 mt-4 max-w-3xl mx-auto leading-relaxed"
-            set:html={description}
-            >
-            </p>
-          )}
-        </div>
-
-        <!-- Language Selector and Download Button -->
-        <div class="space-y-4 max-w-2xl mx-auto">
-          {
-            post.data.availableLanguages && post.data.availableLanguages.length > 0 && (
-              <div class="bg-slate-800/60 backdrop-blur-sm rounded-xl p-6 border border-yellow-400/20">
-                <h3 class="text-lg font-semibold text-yellow-400 mb-4 text-center">
-                  Choose Translation Language
-                </h3>
-                <div class="flex gap-4 justify-center flex-wrap">
-                  {Languages.filter((item) =>
-                    post.data?.availableLanguages?.includes(item.label)
-                  ).map((item) => (
-                    <button
-                      title={`Show ${item.label} Translation`}
-                      id={`lang-${item.label}`}
-                      aria-label={`Show ${item.label} Translation`}
-                      class="group relative border-2 border-gray-600 text-white rounded-lg font-bold 
-                             h-16 w-16 flex flex-col items-center justify-center transition-all duration-300 
-                             hover:border-yellow-400 hover:bg-yellow-400/10 hover:scale-110"
-                    >
-                      <span class="text-2xl">{item.symbol}</span>
-                      <span class="text-[10px] mt-1 capitalize text-white/70 group-hover:text-yellow-400">
-                        {item.label}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )
-          }
-          
-          <!-- Download PDF Button -->
-          <div class="bg-slate-800/60 backdrop-blur-sm rounded-xl p-4 border border-yellow-400/20">
-            <button
-              id="download-pdf-btn"
-              class="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 
-                     text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 
-                     hover:scale-105 shadow-lg flex items-center justify-center gap-2"
-              aria-label="Download as PDF"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                      d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-              </svg>
-              <span>Download as PDF</span>
-            </button>
+            )}
           </div>
+
+          <!-- Title -->
+          <h1 class="content-page__title" lang="hi">{titleDevanagri}</h1>
+          <p class="content-page__title-en">{titleEnglish}</p>
+          {description && (
+            <p class="content-page__description" set:html={description}></p>
+          )}
+
+          <!-- Meta row: date + source -->
+          <div class="content-page__meta">
+            <span class="content-page__meta-item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect><line x1="16" x2="16" y1="2" y2="6"></line><line x1="8" x2="8" y1="2" y2="6"></line><line x1="3" x2="21" y1="10" y2="10"></line></svg>
+              <time datetime={pubDate.toISOString()}>
+                {pubDate.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}
+              </time>
+            </span>
+            {post.data.sourceName && (
+              <span class="content-page__meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"></path></svg>
+                <span set:html={post.data.sourceName} />
+              </span>
+            )}
+          </div>
+
         </div>
       </div>
-    </div>
 
-    <!-- Main Content Section -->
-    <main class="relative bg-gray-900">
-      <div class="max-w-7xl mx-auto px-4">
-        <!-- Sacred Content Card -->
-        
-        <div class="px-6 md:px-10 lg:px-12">
+      <!-- 2-Column Layout: Content + Sidebar -->
+      <div class="content-page__layout">
+        <div class="content-page__main">
           <ArticleBody
             data={post.data}
             availableLanguages={post.data.availableLanguages || []}
+            verses={post.data.verses || []}
+            availableScripts={post.data.availableScripts || ["devanagari"]}
             Content={Content}
           />
-        
 
-          <!-- Source Information Card -->
-          {(post.data.sourceName || post.data.sourceDescription || post.data.sourceLink || post.data.extraInfo) && (
-            <div class="mt-8 bg-slate-800/60 backdrop-blur-sm rounded-xl p-6
-           max-w-5xl
-mx-auto            
-            
-            md:p-8 border border-slate-700">
-              <h3 class="text-xl font-bold text-yellow-400 mb-4 flex items-center">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                Sources & Additional Information
-              </h3>
-              
-              <div class="space-y-3 text-white/80 text-sm leading-relaxed">
-                {post.data.sourceName && (
-                  <div>
-                    <span class="font-semibold text-yellow-300">Source: </span>
-                    <span set:html={post.data.sourceName} />
-                  </div>
-                )}
+          <!-- Info Accordion Sections -->
+          <InfoAccordion sections={infoSections} />
+        </div>
 
-                {post.data.sourceDescription && (
-                  <div class="text-white/70" set:html={post.data.sourceDescription} />
-                )}
-
-                {post.data.sourceLink && (
-                  <div>
-                    <span class="font-semibold text-yellow-300">Reference Link: </span>
-                    <a
-                      href={post.data.sourceLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="text-blue-400 hover:text-blue-300 hover:underline transition-colors"
-                    >
-                      {post.data.sourceLink.length > 60 
-                        ? post.data.sourceLink.substring(0, 60) + "..." 
-                        : post.data.sourceLink}
-                    </a>
-                  </div>
-                )}
-
-                {post.data.extraInfo && (
-                  <div class="mt-4 pt-4 border-t border-slate-700">
-                    <span class="font-semibold text-yellow-300 block mb-2">Additional Information:</span>
-                    <div class="text-white/70" set:html={post.data.extraInfo} />
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          <!-- Related Tags Section -->
-          {post.data.tags && post.data.tags.length > 0 && (
-            <div class="mt-8 text-center">
-              <p class="text-white/60 text-sm mb-3">Explore more content:</p>
-              <div class="flex flex-wrap justify-center gap-2">
-                {post.data.tags.map((tag: any) =>
-                  Tags.includes(tag) ? (
-                    <a
-                      href={`/tags/${tag}`}
-                      class="bg-slate-800/60 hover:bg-slate-700/60 text-white/80 hover:text-yellow-400 
-                            rounded-lg px-4 py-2 text-sm font-medium transition-all duration-300 
-                            border border-slate-700 hover:border-yellow-400/40"
-                    >
-                      View all {tag}
-                    </a>
-                  ) : null
-                )}
-              </div>
-            </div>
-          )}
+        <!-- Sidebar -->
+        <div class="content-page__sidebar">
+          <Sidebar
+            currentSlug={post.slug}
+            currentTags={post.data.tags || []}
+          />
         </div>
       </div>
     </main>
@@ -469,3 +402,166 @@ mx-auto
     <Footer />
   </body>
 </html>
+
+<style>
+  /* ===================================
+     CONTENT PAGE LAYOUT
+     =================================== */
+  .content-page {
+    padding-top: var(--nav-height);
+  }
+
+  /* Hero / Title */
+  .content-page__hero {
+    background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: var(--space-8) var(--space-4) var(--space-10);
+  }
+
+  .content-page__hero-inner {
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+  }
+
+  /* Tags */
+  .content-page__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-5);
+  }
+
+  .content-page__tag {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gold-400);
+    background: rgba(212, 160, 23, 0.1);
+    border: 1px solid var(--border-gold);
+    border-radius: var(--radius-full);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+
+  .content-page__tag:hover {
+    background: rgba(212, 160, 23, 0.2);
+    border-color: var(--border-gold-strong);
+  }
+
+  .content-page__tag--plain {
+    color: var(--text-secondary);
+    background: var(--surface-hover);
+    border-color: var(--border-subtle);
+  }
+
+  /* Title */
+  .content-page__title {
+    font-size: var(--text-3xl);
+    font-weight: 600;
+    color: var(--gold-400);
+    font-family: var(--font-devanagari);
+    line-height: var(--leading-tight);
+    margin-bottom: var(--space-2);
+  }
+
+  .content-page__title-en {
+    font-size: var(--text-xl);
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-bottom: var(--space-4);
+  }
+
+  .content-page__description {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    line-height: var(--leading-relaxed);
+    max-width: 700px;
+    margin-bottom: var(--space-5);
+  }
+
+  /* Meta row */
+  .content-page__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    align-items: center;
+    margin-bottom: var(--space-5);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .content-page__meta-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  /* 2-Column Layout */
+  .content-page__layout {
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    padding: var(--space-8) var(--space-4);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+
+  .content-page__main {
+    min-width: 0; /* prevent overflow */
+  }
+
+  .content-page__sidebar {
+    order: 1;
+  }
+
+  @media (min-width: 640px) {
+    .content-page__hero {
+      padding: var(--space-10) var(--space-6) var(--space-12);
+    }
+
+    .content-page__title {
+      font-size: var(--text-4xl);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .content-page__layout {
+      grid-template-columns: 1fr var(--sidebar-width);
+      gap: var(--space-10);
+      padding: var(--space-6) var(--space-6);
+    }
+
+    .content-page__sidebar {
+      order: 0;
+    }
+
+    .content-page__title {
+      font-size: var(--text-5xl);
+    }
+
+    .content-page__title-en {
+      font-size: var(--text-2xl);
+    }
+  }
+
+  /* Spinning icon for PDF loading */
+  :global(.spin-icon) {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.spin-icon) {
+      animation: none;
+    }
+  }
+</style>

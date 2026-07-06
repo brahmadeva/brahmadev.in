@@ -1,0 +1,384 @@
+---
+/**
+ * VerseReader — renders structured scripture verses with two independent,
+ * self-contained toggles:
+ *   1. Script      — switches the shloka text between Devanagari and IAST.
+ *   2. Translation — switches the meaning shown beneath it (en / hi / mr / ...).
+ *
+ * Content is data (frontmatter `verses[]`), not hand-authored HTML, so adding a
+ * verse or a language never means writing another wrapper tag. Line breaks in
+ * any field are real newlines, rendered via `white-space: pre-line`.
+ */
+import { Languages } from "../utils/consts";
+
+const { verses = [], availableScripts = ["devanagari"], availableLanguages = [] } = Astro.props;
+
+const SCRIPTS = [
+  { id: "devanagari", name: "Devanagari", symbol: "अ" }, // अ
+  { id: "iast", name: "IAST", symbol: "Ā" },            // Ā
+];
+
+// Only offer a script the page actually carries, and only offer IAST if at
+// least one verse has an `iast` field.
+const hasIast = verses.some((v: any) => v.iast);
+const scriptOptions = SCRIPTS.filter(
+  (s) => availableScripts.includes(s.id) && (s.id !== "iast" || hasIast)
+);
+const defaultScript = scriptOptions[0]?.id ?? "devanagari";
+
+const langOptions = Languages.filter((l: any) => availableLanguages.includes(l.label));
+const defaultLang = langOptions[0]?.label ?? null;
+
+const TRANS_LANGS = ["english", "hindi", "marathi", "tamil", "punjabi", "bangla", "gujarati", "kannada", "telugu", "odia"];
+const langKey: Record<string, string> = {
+  english: "en", hindi: "hi", marathi: "mr", tamil: "ta", punjabi: "pa",
+  bangla: "bn", gujarati: "gu", kannada: "kn", telugu: "te", odia: "or",
+};
+---
+
+<div class="verse-reader">
+  {(scriptOptions.length > 1 || langOptions.length > 0) && (
+    <div class="verse-controls" role="toolbar" aria-label="Reading options">
+      {scriptOptions.length > 1 && (
+        <div class="verse-controls__group" role="group" aria-label="Script">
+          <span class="verse-controls__label">Script</span>
+          <div class="verse-seg" data-role="script">
+            {scriptOptions.map((s) => (
+              <button
+                type="button"
+                class="verse-seg__btn"
+                data-script={s.id}
+                aria-pressed={s.id === defaultScript ? "true" : "false"}
+                title={`Show verse in ${s.name}`}
+              >
+                <span class="verse-seg__symbol" aria-hidden="true">{s.symbol}</span>
+                <span class="verse-seg__name">{s.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {langOptions.length > 0 && (
+        <div class="verse-controls__group" role="group" aria-label="Translation language">
+          <span class="verse-controls__label">Translation</span>
+          <div class="verse-seg" data-role="lang">
+            {langOptions.map((l: any) => (
+              <button
+                type="button"
+                class="verse-seg__btn"
+                data-lang={l.label}
+                aria-pressed={l.label === defaultLang ? "true" : "false"}
+                title={`Show ${l.label} translation`}
+              >
+                <span class="verse-seg__symbol" aria-hidden="true">{l.symbol}</span>
+                <span class="verse-seg__name">{l.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )}
+
+  <div class="verses" data-script={defaultScript} data-lang={defaultLang}>
+    {verses.map((v: any) => {
+      const role = v.role || "verse";
+      return (
+        <div class={`verse verse--${role}`}>
+          <div class="verse__shlok">
+            <p class="verse__script" lang="sa" data-script="devanagari" hidden={defaultScript !== "devanagari"}>{v.dev}</p>
+            {v.iast && (
+              <p class="verse__script verse__script--iast" data-script="iast" hidden={defaultScript !== "iast"}>{v.iast}</p>
+            )}
+          </div>
+
+          {TRANS_LANGS.some((l) => v[langKey[l]]) && (
+            <div class="verse__meaning">
+              {TRANS_LANGS.map((l) =>
+                v[langKey[l]] ? (
+                  <p
+                    class="verse__trans"
+                    lang={langKey[l]}
+                    data-lang={l}
+                    hidden={defaultLang !== l}
+                  >{v[langKey[l]]}</p>
+                ) : null
+              )}
+            </div>
+          )}
+        </div>
+      );
+    })}
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>(".verse-reader").forEach((reader) => {
+    const versesEl = reader.querySelector<HTMLElement>(".verses");
+    if (!versesEl) return;
+
+    const applyToggle = (kind: "script" | "lang", value: string) => {
+      const attr = kind === "script" ? "data-script" : "data-lang";
+      versesEl.setAttribute(kind === "script" ? "data-script" : "data-lang", value);
+      versesEl
+        .querySelectorAll<HTMLElement>(kind === "script" ? ".verse__script" : ".verse__trans")
+        .forEach((el) => {
+          el.hidden = el.getAttribute(attr) !== value;
+        });
+    };
+
+    reader.querySelectorAll<HTMLElement>(".verse-seg").forEach((seg) => {
+      const kind = seg.dataset.role === "script" ? "script" : "lang";
+      const attr = kind === "script" ? "data-script" : "data-lang";
+      seg.querySelectorAll<HTMLButtonElement>(".verse-seg__btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const value = btn.getAttribute(attr);
+          if (!value) return;
+          seg.querySelectorAll(".verse-seg__btn").forEach((b) =>
+            b.setAttribute("aria-pressed", b === btn ? "true" : "false")
+          );
+          applyToggle(kind, value);
+        });
+      });
+    });
+  });
+</script>
+
+<style>
+  .verse-reader {
+    --ink: #2d1810;
+    --ink-soft: #5a3d2b;
+    --accent: #8b4513;
+    --parchment-line: rgba(139, 69, 19, 0.18);
+  }
+
+  /* --- Control bar (script + translation toggles) --- */
+  .verse-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3) var(--space-6);
+    width: max-content;
+    max-width: 100%;
+    margin: 0 auto var(--space-8);
+    padding: var(--space-3) var(--space-4);
+    background: #fffdf5;
+    border: 1px solid var(--parchment-border, rgba(139, 69, 19, 0.35));
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 16px rgba(139, 69, 19, 0.16);
+  }
+
+  .verse-controls__group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .verse-controls__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #8a6d3b;
+    white-space: nowrap;
+  }
+
+  .verse-seg {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 3px;
+    background: #f3e9d2;
+    border: 1px solid var(--parchment-line);
+    border-radius: var(--radius-full);
+  }
+
+  .verse-seg__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border: none;
+    background: transparent;
+    color: #6b4423;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    line-height: 1;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .verse-seg__btn:hover,
+  .verse-seg__btn:focus-visible {
+    color: var(--saffron-600, #b4530a);
+  }
+
+  .verse-seg__symbol {
+    font-weight: 700;
+    font-size: 1.05em;
+  }
+
+  .verse-seg__name {
+    text-transform: capitalize;
+  }
+
+  .verse-seg__btn[aria-pressed="true"] {
+    background: linear-gradient(135deg, var(--saffron-500, #e07b1a), var(--saffron-600, #b4530a));
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(139, 69, 19, 0.25);
+  }
+
+  /* --- Verses --- */
+  .verses {
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  .verse {
+    padding: 1.25rem 0;
+    border-bottom: 1px dashed var(--parchment-line);
+    animation: verseFade 0.4s ease-in-out;
+  }
+
+  .verse:last-child {
+    border-bottom: none;
+  }
+
+  @keyframes verseFade {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .verse__shlok {
+    text-align: center;
+  }
+
+  .verse__script {
+    white-space: pre-line;
+    color: var(--ink) !important;
+    font-weight: 600;
+    font-size: calc(1.2rem * var(--reader-scale, 1));
+    line-height: 2.15;
+    margin: 0;
+  }
+
+  .verse__script[lang="sa"] {
+    font-family: var(--font-devanagari, "Noto Sans Devanagari", serif);
+  }
+
+  .verse__script--iast {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--ink-soft) !important;
+    letter-spacing: 0.01em;
+  }
+
+  /* Meaning / translation */
+  .verse__meaning {
+    margin-top: 1rem;
+  }
+
+  .verse__trans {
+    white-space: pre-line;
+    color: var(--ink-soft) !important;
+    font-size: calc(1rem * var(--reader-scale, 1));
+    line-height: 1.95;
+    margin: 0;
+    padding: 0.85rem 1.1rem;
+    text-align: left;
+    background: rgba(139, 69, 19, 0.05);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+  }
+
+  /* Role variants for speaker cues, colophons and section titles. */
+  .verse--speaker .verse__shlok,
+  .verse--colophon .verse__shlok {
+    text-align: center;
+  }
+
+  .verse--speaker .verse__script {
+    font-size: calc(1.05rem * var(--reader-scale, 1));
+    font-weight: 700;
+    color: var(--accent) !important;
+  }
+
+  .verse--colophon {
+    border-bottom: none;
+  }
+
+  .verse--colophon .verse__script {
+    font-size: calc(1.05rem * var(--reader-scale, 1));
+    font-weight: 600;
+    color: var(--accent) !important;
+  }
+
+  .verse--colophon .verse__script--iast {
+    font-weight: 500;
+  }
+
+  .verse--heading .verse__script {
+    font-size: calc(1.35rem * var(--reader-scale, 1));
+    font-weight: 700;
+    color: var(--accent) !important;
+  }
+
+  @media (min-width: 640px) {
+    .verse {
+      padding: 1.6rem 0;
+    }
+    .verse__script {
+      font-size: calc(1.35rem * var(--reader-scale, 1));
+    }
+    .verse__trans {
+      font-size: calc(1.08rem * var(--reader-scale, 1));
+      padding: 1rem 1.35rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .verse__script {
+      font-size: calc(1.5rem * var(--reader-scale, 1));
+      line-height: 2.25;
+    }
+  }
+
+  /* On narrow screens the segmented control's pill buttons would wrap onto
+     multiple lines, and the border-radius: full shape then eats into the
+     buttons instead of just rounding the ends. Scroll horizontally instead. */
+  @media (max-width: 640px) {
+    .verse-controls {
+      width: 100%;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--space-3);
+    }
+
+    .verse-controls__group {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+      width: 100%;
+    }
+
+    .verse-seg {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      max-width: 100%;
+      width: fit-content;
+    }
+
+    .verse-seg::-webkit-scrollbar {
+      display: none;
+    }
+
+    .verse-seg__btn {
+      flex-shrink: 0;
+    }
+  }
+</style>

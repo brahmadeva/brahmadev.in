@@ -1,25 +1,629 @@
+---
+// Site search modal — instant, client-side fuzzy search over the prerendered
+// /search-index.json (built from the page + article collections). Matches
+// across languages (Devanagari + English/transliteration) and tolerates typos
+// / partial words. Open/close + focus-trap live in MetadataHead.astro.
+---
 
+<div
+  id="search-modal"
+  class="search-modal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="search-modal-title"
+  aria-hidden="true"
+>
+  <div class="search-modal__backdrop" data-search-close></div>
 
-
-<div id="search-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden opacity-0 transition-opacity duration-300 ease-out justify-center items-center z-10">
-    <div class="bg-white p-6 rounded-lg w-full max-w-lg shadow-lg transform transition-all duration-300 ease-out scale-95">
- 
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-xl font-semibold">Search</h3>
-            <button id="close-modal-btn" class="text-gray-500 hover:text-gray-700">&times;</button>
-        </div>
-
-     
-        <div class="flex items-center">
-            <input type="text" id="search-input" class="w-full border-b-2 border-gray-300 py-2 px-4 focus:outline-none text-lg focus:border-blue-500" placeholder="Search..." autofocus />
-            <button id="search-btn" class="ml-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">OK</button>
-        </div>
-
-       
-        <!-- <div class="mt-4 space-y-2">
-            <div class="hover:bg-gray-100 px-4 py-2 cursor-pointer rounded-md">Suggested Result 1</div>
-            <div class="hover:bg-gray-100 px-4 py-2 cursor-pointer rounded-md">Suggested Result 2</div>
-            <div class="hover:bg-gray-100 px-4 py-2 cursor-pointer rounded-md">Suggested Result 3</div>
-        </div> -->
+  <div class="search-modal__panel" role="document">
+    <div class="search-modal__header">
+      <h2 id="search-modal-title" class="search-modal__title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.3-4.3"></path>
+        </svg>
+        Search Sacred Texts
+      </h2>
+      <button id="close-modal-btn" class="search-modal__close" aria-label="Close search" data-search-close>
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18 6 6 18"></path>
+          <path d="m6 6 12 12"></path>
+        </svg>
+      </button>
     </div>
+
+    <div class="search-modal__body">
+      <div class="search-modal__field">
+        <svg class="search-modal__field-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.3-4.3"></path>
+        </svg>
+        <input
+          type="search"
+          id="search-input"
+          class="search-modal__input"
+          placeholder="Search stotras, kavach, mantras…"
+          aria-label="Search query"
+          role="combobox"
+          aria-expanded="false"
+          aria-controls="search-results"
+          aria-autocomplete="list"
+          autocomplete="off"
+          autocorrect="off"
+          spellcheck="false"
+        />
+      </div>
+
+      <ul id="search-results" class="search-modal__results" role="listbox" aria-label="Search results" hidden></ul>
+
+      <p id="search-status" class="search-modal__status" aria-live="polite">
+        Search across all texts &amp; articles — in <strong>Hindi</strong> or <strong>English</strong>.
+      </p>
+    </div>
+
+    <div class="search-modal__footer">
+      <span class="search-modal__keys"><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+      <span class="search-modal__keys"><kbd>↵</kbd> open</span>
+      <span class="search-modal__keys"><kbd>esc</kbd> close</span>
+    </div>
+  </div>
 </div>
+
+<style>
+  .search-modal {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-modal);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: var(--space-4);
+    padding-top: 12vh;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity var(--transition-base), visibility var(--transition-base);
+  }
+
+  .search-modal.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .search-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: var(--bg-overlay);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  .search-modal__panel {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    max-height: 76vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-card);
+    border: 1px solid var(--border-gold);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl), var(--shadow-gold-lg);
+    transform: translateY(-16px) scale(0.98);
+    transition: transform var(--transition-base);
+    overflow: hidden;
+  }
+
+  .search-modal.is-open .search-modal__panel {
+    transform: translateY(0) scale(1);
+  }
+
+  .search-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--border-subtle);
+    flex-shrink: 0;
+  }
+
+  .search-modal__title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--gold-400);
+    margin: 0;
+  }
+
+  .search-modal__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+  }
+
+  .search-modal__close:hover,
+  .search-modal__close:focus-visible {
+    color: var(--text-primary);
+    background: var(--surface-hover);
+  }
+
+  .search-modal__body {
+    padding: var(--space-5);
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .search-modal__field {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-3);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .search-modal__field:focus-within {
+    border-color: var(--gold-400);
+    box-shadow: 0 0 0 3px var(--surface-gold-subtle);
+  }
+
+  .search-modal__field-icon {
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  .search-modal__input {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-primary);
+    font-size: var(--text-base);
+    font-family: var(--font-body);
+    padding: var(--space-2) 0;
+  }
+
+  .search-modal__input::placeholder {
+    color: var(--text-muted);
+  }
+
+  /* Remove native search "x" clutter for a cleaner field */
+  .search-modal__input::-webkit-search-decoration,
+  .search-modal__input::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+  }
+
+  /* Results */
+  .search-modal__results {
+    list-style: none;
+    margin: var(--space-4) 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  /* Author display:flex above would otherwise override the [hidden] attribute */
+  .search-modal__results[hidden] {
+    display: none;
+  }
+
+  /* Result rows are injected via innerHTML at runtime, so they never get
+     Astro's scoping attribute — their selectors MUST be :global(), nested under
+     the scoped .search-modal so they stay namespaced to this component. */
+  .search-modal :global(.search-modal__results li) {
+    margin: 0;
+    padding: 0;
+  }
+
+  .search-modal :global(.search-result) {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    box-shadow: inset 3px 0 0 transparent;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast);
+  }
+
+  .search-modal :global(.search-result--scripture) {
+    box-shadow: inset 3px 0 0 var(--gold-400);
+  }
+
+  .search-modal :global(.search-result--article) {
+    box-shadow: inset 3px 0 0 var(--saffron-500);
+  }
+
+  .search-modal :global(.search-result:hover),
+  .search-modal :global(.search-result.is-active) {
+    background: var(--surface-hover);
+    border-color: var(--border-gold);
+  }
+
+  .search-modal :global(.search-result__meta) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: 1px;
+  }
+
+  .search-modal :global(.search-result__type) {
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .search-modal :global(.search-result--scripture .search-result__type) {
+    color: var(--gold-400);
+  }
+
+  .search-modal :global(.search-result--article .search-result__type) {
+    color: var(--saffron-500);
+  }
+
+  .search-modal :global(.search-result__tag) {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    background: var(--surface-hover-strong);
+    padding: 1px 8px;
+    border-radius: var(--radius-full);
+    text-transform: capitalize;
+  }
+
+  .search-modal :global(.search-result__title-hi) {
+    font-family: var(--font-devanagari);
+    font-weight: 600;
+    font-size: var(--text-base);
+    color: var(--text-primary);
+    line-height: var(--leading-tight);
+  }
+
+  .search-modal :global(.search-result__title-en) {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: var(--leading-tight);
+  }
+
+  .search-modal :global(.search-result mark) {
+    background: rgba(212, 160, 23, 0.28);
+    color: inherit;
+    border-radius: 2px;
+    padding: 0 1px;
+    font-weight: inherit;
+  }
+
+  .search-modal__status {
+    margin: var(--space-4) 0 0;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  .search-modal :global(.search-modal__status strong) {
+    color: var(--gold-400);
+    font-weight: 600;
+  }
+
+  .search-modal__footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-5);
+    border-top: 1px solid var(--border-subtle);
+    background: var(--bg-tertiary);
+    flex-shrink: 0;
+  }
+
+  .search-modal__keys {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+
+  .search-modal__footer kbd {
+    font-family: monospace;
+    font-size: var(--text-xs);
+    background: var(--surface-hover-strong);
+    color: var(--text-secondary);
+    min-width: 18px;
+    text-align: center;
+    padding: 1px 5px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-subtle);
+  }
+
+  @media (max-width: 480px) {
+    .search-modal {
+      padding: var(--space-3);
+      padding-top: 8vh;
+    }
+    .search-modal__panel {
+      max-height: 84vh;
+    }
+    .search-modal__footer {
+      gap: var(--space-3);
+    }
+  }
+</style>
+
+<script>
+  interface SearchRecord {
+    type: "scripture" | "article";
+    url: string;
+    titleHi: string;
+    titleEn: string;
+    description: string;
+    tags: string[];
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const input = document.getElementById("search-input") as HTMLInputElement | null;
+    const resultsEl = document.getElementById("search-results") as HTMLUListElement | null;
+    const statusEl = document.getElementById("search-status") as HTMLElement | null;
+    if (!input || !resultsEl || !statusEl) return;
+
+    const defaultStatus = statusEl.innerHTML;
+    let data: SearchRecord[] = [];
+    let indexPromise: Promise<SearchRecord[]> | null = null;
+    let items: HTMLAnchorElement[] = [];
+    let active = -1;
+
+    // --- Load the prerendered index once, lazily ---
+    const loadIndex = () => {
+      if (!indexPromise) {
+        indexPromise = fetch("/search-index.json")
+          .then((r) => (r.ok ? r.json() : []))
+          .then((d: SearchRecord[]) => (data = Array.isArray(d) ? d : []))
+          .catch(() => (data = []));
+      }
+      return indexPromise;
+    };
+    input.addEventListener("focus", loadIndex, { once: true });
+
+    // --- Text helpers: fold case + Latin diacritics; keep Devanagari intact ---
+    const fold = (s: string) =>
+      (s || "")
+        .toLowerCase()
+        .normalize("NFKD")
+        // Strip Latin combining diacritics (U+0300–U+036F); Devanagari untouched.
+        .split("")
+        .filter((c) => c.charCodeAt(0) < 0x300 || c.charCodeAt(0) > 0x36f)
+        .join("");
+
+    // Split on anything that isn't a Latin alphanumeric or a Devanagari char
+    // (U+0900–U+097F), so both scripts tokenize into words.
+    const tokenize = (s: string) =>
+      fold(s)
+        .split(/[^0-9a-zऀ-ॿ]+/i)
+        .filter(Boolean);
+
+    // Bounded Levenshtein distance (small strings only)
+    const lev = (a: string, b: string) => {
+      const m = a.length;
+      const n = b.length;
+      if (!m) return n;
+      if (!n) return m;
+      let prev = Array.from({ length: n + 1 }, (_, i) => i);
+      let curr = new Array(n + 1).fill(0);
+      for (let i = 1; i <= m; i++) {
+        curr[0] = i;
+        for (let j = 1; j <= n; j++) {
+          const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+          curr[j] = Math.min(prev[j] + 1, curr[j - 1] + 1, prev[j - 1] + cost);
+        }
+        [prev, curr] = [curr, prev];
+      }
+      return prev[n];
+    };
+
+    const isSubsequence = (needle: string, hay: string) => {
+      let i = 0;
+      for (let j = 0; j < hay.length && i < needle.length; j++) {
+        if (hay[j] === needle[i]) i++;
+      }
+      return i === needle.length;
+    };
+
+    // Score one query token against one field word (0 = no match)
+    const wordScore = (qt: string, w: string) => {
+      if (!w) return 0;
+      if (w === qt) return 1;
+      if (w.startsWith(qt)) return 0.92;
+      if (w.includes(qt)) return 0.82;
+      if (qt.includes(w) && w.length >= 3) return 0.6;
+      const dist = lev(qt, w);
+      const maxAllowed = qt.length <= 4 ? 1 : 2;
+      if (dist <= maxAllowed) return 0.7 * (1 - dist / Math.max(qt.length, w.length));
+      if (qt.length >= 3 && isSubsequence(qt, w)) return 0.4;
+      return 0;
+    };
+
+    const scoreRecord = (qTokens: string[], rec: SearchRecord) => {
+      const fields = [
+        { words: tokenize(rec.titleHi), w: 10 },
+        { words: tokenize(rec.titleEn), w: 10 },
+        { words: tokenize(rec.tags.join(" ")), w: 6 },
+        { words: tokenize(rec.description), w: 3 },
+      ];
+      let total = 0;
+      for (const qt of qTokens) {
+        let best = 0;
+        for (const f of fields) {
+          for (const w of f.words) {
+            const s = wordScore(qt, w) * f.w;
+            if (s > best) best = s;
+          }
+        }
+        if (best === 0) return -1; // every token must match somewhere (AND)
+        total += best;
+      }
+      // Bonus when the whole query appears verbatim in a title.
+      const q = fold(qTokens.join(" "));
+      if (fold(rec.titleHi + " " + rec.titleEn).includes(q)) total += 5;
+      return total;
+    };
+
+    const search = (query: string): SearchRecord[] => {
+      const qTokens = tokenize(query);
+      if (!qTokens.length) return [];
+      const scored: { rec: SearchRecord; score: number }[] = [];
+      for (const rec of data) {
+        const score = scoreRecord(qTokens, rec);
+        if (score > 0) scored.push({ rec, score });
+      }
+      scored.sort((a, b) => b.score - a.score);
+      return scored.slice(0, 12).map((s) => s.rec);
+    };
+
+    // --- Rendering ---
+    const escapeHtml = (s: string) =>
+      s.replace(/[&<>"']/g, (c) =>
+        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] as string
+      );
+    const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+    const highlight = (text: string, qTokens: string[]) => {
+      const safe = escapeHtml(text || "");
+      const parts = qTokens.filter((t) => t.length >= 2).map(escapeRegExp);
+      if (!parts.length) return safe;
+      parts.sort((a, b) => b.length - a.length);
+      try {
+        return safe.replace(new RegExp(`(${parts.join("|")})`, "giu"), "<mark>$1</mark>");
+      } catch {
+        return safe;
+      }
+    };
+
+    const setStatus = (html: string) => {
+      statusEl.innerHTML = html;
+    };
+
+    const clearActive = () => {
+      active = -1;
+      input.removeAttribute("aria-activedescendant");
+    };
+
+    const render = (results: SearchRecord[], query: string) => {
+      const qTokens = tokenize(query);
+      clearActive();
+
+      if (!query.trim()) {
+        resultsEl.innerHTML = "";
+        resultsEl.hidden = true;
+        input.setAttribute("aria-expanded", "false");
+        setStatus(defaultStatus);
+        items = [];
+        return;
+      }
+
+      if (!results.length) {
+        resultsEl.innerHTML = "";
+        resultsEl.hidden = true;
+        input.setAttribute("aria-expanded", "false");
+        setStatus(`No results for “<strong>${escapeHtml(query.trim())}</strong>”`);
+        items = [];
+        return;
+      }
+
+      resultsEl.innerHTML = results
+        .map((r, i) => {
+          const label = r.type === "article" ? "Article" : "Scripture";
+          const tags = (r.tags || [])
+            .slice(0, 3)
+            .map((t) => `<span class="search-result__tag">${escapeHtml(t)}</span>`)
+            .join("");
+          return `
+            <li>
+              <a class="search-result search-result--${r.type}" role="option" id="search-opt-${i}" href="${r.url}" tabindex="-1" aria-selected="false">
+                <span class="search-result__meta">
+                  <span class="search-result__type">${label}</span>
+                  ${tags}
+                </span>
+                ${r.titleHi ? `<span class="search-result__title-hi" lang="hi">${highlight(r.titleHi, qTokens)}</span>` : ""}
+                ${r.titleEn ? `<span class="search-result__title-en">${highlight(r.titleEn, qTokens)}</span>` : ""}
+              </a>
+            </li>`;
+        })
+        .join("");
+      resultsEl.hidden = false;
+      input.setAttribute("aria-expanded", "true");
+      setStatus(`${results.length} result${results.length > 1 ? "s" : ""}`);
+
+      items = Array.from(resultsEl.querySelectorAll<HTMLAnchorElement>(".search-result"));
+      items.forEach((el, i) =>
+        el.addEventListener("mousemove", () => {
+          if (active !== i) setActive(i);
+        })
+      );
+    };
+
+    const setActive = (i: number) => {
+      if (!items.length) return;
+      active = (i + items.length) % items.length;
+      items.forEach((el, idx) => {
+        const on = idx === active;
+        el.classList.toggle("is-active", on);
+        el.setAttribute("aria-selected", String(on));
+      });
+      const el = items[active];
+      el.scrollIntoView({ block: "nearest" });
+      input.setAttribute("aria-activedescendant", el.id);
+    };
+
+    // --- Input (debounced) ---
+    let debounce: number | undefined;
+    input.addEventListener("input", () => {
+      window.clearTimeout(debounce);
+      debounce = window.setTimeout(async () => {
+        const query = input.value;
+        await loadIndex();
+        render(search(query), query);
+      }, 70);
+    });
+
+    // --- Keyboard navigation ---
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowDown") {
+        if (!items.length) return;
+        e.preventDefault();
+        setActive(active + 1);
+      } else if (e.key === "ArrowUp") {
+        if (!items.length) return;
+        e.preventDefault();
+        setActive(active - 1);
+      } else if (e.key === "Enter") {
+        if (!items.length) return;
+        e.preventDefault();
+        const target = items[active >= 0 ? active : 0];
+        const href = target?.getAttribute("href");
+        if (href) window.location.href = href;
+      }
+    });
+  });
+</script>

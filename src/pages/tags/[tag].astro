@@ -1,6 +1,7 @@
 ---
 import Topbar from "../../components/Topbar.astro";
 import Footer from "../../components/Footer.astro";
+import Breadcrumb from "../../components/Breadcrumb.astro";
 import RecentCards from "../../components/RecentCards.astro";
 import MetadataHead from "../../components/MetadataHead.astro";
 import {
@@ -9,34 +10,43 @@ import {
   SITE_TITLE_DEVANAGRI,
   Tags,
 } from "../../utils/consts";
-import { getCollection } from "astro:content";
+import { getPublished } from "../../utils/content";
 import SearchModal from "../../components/SearchModal.astro";
 
-// this genraes
 export async function getStaticPaths(): Promise<any> {
-  const allPosts: any = await Astro.glob("../../content/page/*.md");
-
-  return Tags.map((_tag) => {
-    return {
-      params: {
-        tag: _tag,
-      },
-      props: { posts: allPosts },
-    };
-  });
+  return Tags.map((_tag) => ({
+    params: { tag: _tag },
+  }));
 }
 
 const { tag } = Astro.params;
-const { posts } = Astro.props;
-// const filteredPosts = (posts as any[]).filter((post: any) => post.frontmatter.tags?.includes(tag));
 
-const MyPagesCollection = (await getCollection("page"))
+const MyPagesCollection = (await getPublished("page"))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .filter((item) => item.data.tags?.includes(tag));
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const ogSiteName = `${SITE_TITLE_DEVANAGRI} ${SITE_TITLE_SEPARATOR} ${SITE_TITLE}`;
-const pageName = `${tag} ${SITE_TITLE_SEPARATOR} Pages Tagged with ${tag} ${SITE_TITLE_SEPARATOR} ${ogSiteName}`;
+const tagLabel = (tag as string).charAt(0).toUpperCase() + (tag as string).slice(1);
+const pageName = `${tagLabel} ${SITE_TITLE_SEPARATOR} ${ogSiteName}`;
+
+const tagDescriptions: Record<string, string> = {
+  stotram: "Sacred hymns of praise and devotion",
+  stuti: "Devotional prayers and eulogies",
+  kavach: "Protective mantras and armor prayers",
+  namavali: "Collections of divine names",
+  suktam: "Vedic hymns and sacred verses",
+  vidhi: "Ritual procedures and worship methods",
+};
+
+const tagDescriptionsHi: Record<string, string> = {
+  stotram: "स्तुति गान",
+  stuti: "भक्ति प्रार्थनाएँ",
+  kavach: "रक्षा मंत्र",
+  namavali: "नामावली",
+  suktam: "वैदिक सूक्त",
+  vidhi: "पूजा विधि",
+};
 
 const ldSchema = {
   "@context": "https://schema.org",
@@ -61,84 +71,179 @@ const ldSchema = {
 <html lang="en">
   <head>
     <MetadataHead />
-
     <link rel="canonical" href={canonicalURL} />
     <title>{pageName}</title>
     <meta property="og:type" content="website" />
     <meta property="og:url" content={Astro.url} />
     <meta property="og:title" content={pageName} />
     <meta property="og:site_name" content={ogSiteName} />
-
-    <script type="application/ld+json" set:html={JSON.stringify(ldSchema)}>
-    </script>
-
-
-
-
+    <script type="application/ld+json" set:html={JSON.stringify(ldSchema)}></script>
   </head>
 
-  <body class="bg-gray-900 min-h-screen">
+  <body>
     <Topbar />
     <SearchModal />
 
-    <!-- Hero Section -->
-    <div class="relative pt-24 pb-12 bg-gradient-to-b from-gray-900 via-slate-900 to-gray-800">
-      <div class="max-w-7xl mx-auto px-4">
-        <!-- Breadcrumb -->
-        <nav class="mb-6 flex items-center text-sm text-white/60">
-          <a href="/tags" class="hover:text-yellow-400 transition-colors">Tags</a>
-          <svg class="w-4 h-4 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-          </svg>
-          <span class="text-white capitalize">{tag}</span>
-        </nav>
+    <main id="main-content" class="tag-page">
+      <!-- Hero -->
+      <div class="tag-page__hero">
+        <div class="tag-page__hero-inner">
+          <Breadcrumb items={[
+            { label: "Home", href: "/" },
+            { label: "All Scriptures", href: "/tags" },
+            { label: tagLabel },
+          ]} />
 
-        <div class="text-center mb-8">
-          <div class="inline-flex items-center gap-3 mb-4">
-            <span class="text-5xl text-yellow-400">#</span>
-            <h1 class="text-4xl md:text-5xl font-bold text-yellow-400 capitalize">
-              {tag}
-            </h1>
+          <div class="tag-page__heading">
+            <h1 class="tag-page__title">{tagLabel}</h1>
+            <span class="tag-page__count">{MyPagesCollection.length} {MyPagesCollection.length === 1 ? ' item' : ' items'}</span>
           </div>
-          <p class="text-white/70 text-lg">
-            {MyPagesCollection.length}&nbsp;{MyPagesCollection.length === 1 ? 'item' : 'items'} in this collection
-          </p>
+          <p class="tag-page__subtitle" lang="hi">{tagDescriptionsHi[tag as string] || ""}</p>
+          <p class="tag-page__desc">{tagDescriptions[tag as string] || `Explore all ${tag} content`}</p>
+
+          <!-- Other tags -->
+          <div class="tag-page__other-tags">
+            {Tags.filter(t => t !== tag).map(t => (
+              <a href={`/tags/${t}`} class="tag-page__other-tag">
+                {t.charAt(0).toUpperCase() + t.slice(1)}
+              </a>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Content Section -->
-    <div class="bg-gray-900 py-12">
-      <div class="max-w-7xl mx-auto px-4">
+      <!-- Content -->
+      <div class="tag-page__content">
         {MyPagesCollection.length > 0 ? (
           <RecentCards pages={MyPagesCollection} />
         ) : (
-          <div class="max-w-2xl mx-auto">
-            <div class="bg-slate-800/60 backdrop-blur-sm rounded-xl p-12 border border-slate-700 text-center">
-              <div class="text-6xl mb-4">📚</div>
-              <h2 class="text-2xl font-bold text-white mb-3">
-                No documents found
-              </h2>
-              <p class="text-white/70 mb-8">
-                Content for this tag is being added soon. Stay tuned!
-              </p>
-              <a
-                href="/tags"
-                class="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 
-                       hover:from-orange-600 hover:to-red-600 text-white font-bold py-3 px-6 
-                       rounded-lg transition-all duration-300 hover:scale-105 shadow-lg"
-              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                </svg>
-                Browse All Tags
-              </a>
-            </div>
+          <div class="tag-page__empty">
+            <div class="tag-page__empty-icon">📚</div>
+            <h2 class="tag-page__empty-title">No documents found</h2>
+            <p class="tag-page__empty-desc">Content for this category is being added soon. Stay tuned!</p>
+            <a href="/tags" class="hero__cta-primary" style="display: inline-flex;">Browse All Scriptures</a>
           </div>
         )}
       </div>
-    </div>
+    </main>
 
     <Footer />
   </body>
 </html>
+
+<style>
+  .tag-page {
+    padding-top: var(--nav-height);
+  }
+
+  /* Hero */
+  .tag-page__hero {
+    background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: var(--space-8) var(--space-4) var(--space-10);
+  }
+
+  .tag-page__hero-inner {
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+  }
+
+  .tag-page__heading {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-1);
+  }
+
+  .tag-page__title {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--gold-400);
+  }
+
+  .tag-page__count {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--text-muted);
+    background: var(--surface-hover);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+  }
+
+  .tag-page__subtitle {
+    font-size: var(--text-lg);
+    color: var(--text-secondary);
+    font-family: var(--font-devanagari);
+    margin-bottom: var(--space-2);
+  }
+
+  .tag-page__desc {
+    font-size: var(--text-base);
+    color: var(--text-muted);
+    margin-bottom: var(--space-6);
+  }
+
+  .tag-page__other-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .tag-page__other-tag {
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-full);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+
+  .tag-page__other-tag:hover {
+    border-color: var(--border-gold);
+    color: var(--gold-400);
+  }
+
+  /* Content */
+  .tag-page__content {
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    padding: var(--space-10) var(--space-4);
+  }
+
+  /* Empty State */
+  .tag-page__empty {
+    text-align: center;
+    padding: var(--space-16) var(--space-6);
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xl);
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .tag-page__empty-icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-4);
+  }
+
+  .tag-page__empty-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-3);
+  }
+
+  .tag-page__empty-desc {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin-bottom: var(--space-8);
+  }
+
+  @media (min-width: 640px) {
+    .tag-page__title {
+      font-size: var(--text-4xl);
+    }
+  }
+</style>
