@@ -2,7 +2,7 @@
 titleDevanagri: "श्री ब्रह्माजी के प्रति भक्ती के प्रभेद, रथयात्रा, कार्तिक पूर्णिमा पर दर्शन का माहात्म्य, तथा 108 नाम"
 titleEnglish: "Devotion towords Lord Brahma, Rath Yatra, Importance of Darshan on Kartika Purnima, and 108 Names"
 
-description: This chapter from the Prabhasa Khanda of the Skanda Purana records Lord Shiva's teaching to Parvati on devotion to Lord Brahma. It distinguishes the three kinds of bhakti — worldly, Vedic, and spiritual — describes meditation upon the Creator seated in the lotus of the heart, and sets out the Kartik full-moon rites and ratha yatra at Prabhasa kshetra, and the sacred one hundred and eight names by which Brahma abides in many holy places.
+description: This chapter from the Prabhasa Khanda of the Skanda Purana records Lord Shiva's teaching to Parvati on devotion to Lord Brahma. It distinguishes the three kinds of bhakti - worldly, Vedic, and spiritual - describes meditation upon the Creator seated in the lotus of the heart, and sets out the Kartik full-moon rites and ratha yatra at Prabhasa kshetra, and the sacred one hundred and eight names by which Brahma abides in many holy places.
 
 
 sourceName: "श्री स्कन्द पुराण / प्रभास-खण्ड / अध्याय 31"

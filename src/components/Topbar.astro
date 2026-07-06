@@ -14,7 +14,7 @@ const navLinks = [
 ];
 
 // Precise active-state matching so a sub-category (e.g. /tags/stuti)
-// highlights ONLY that link — not the "Scriptures" (/tags) parent too.
+// highlights ONLY that link - not the "Scriptures" (/tags) parent too.
 const normalizePath = (p: string) => (p !== "/" && p.endsWith("/") ? p.slice(0, -1) : p);
 const cur = normalizePath(currentPath);
 const isActive = (href: string) => {
@@ -343,7 +343,7 @@ const isActive = (href: string) => {
   }
 
   /* Icon swap for the theme toggle. `data-theme` is set on <html>, which is
-     OUTSIDE this component's scope — so the ancestor must be :global() or Astro
+     OUTSIDE this component's scope - so the ancestor must be :global() or Astro
      scopes it to an element that doesn't exist and the swap never happens.
      Convention: dark shows the sun, light shows the moon. */
   .theme-icon-moon {

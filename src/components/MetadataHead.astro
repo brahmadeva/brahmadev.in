@@ -53,17 +53,16 @@ import "../styles/global.css";
   // Mark that JS is available so scroll-reveal start-states only apply with JS.
   document.documentElement.classList.add('js');
 
-  // Theme init — runs before first paint to avoid a flash of the wrong theme.
+  // Theme init - runs before first paint to avoid a flash of the wrong theme.
   // If the user has manually toggled before, honour that saved choice;
-  // otherwise fall back to the device's OS-level light/dark preference.
+  // otherwise default to light (the OS-level preference is ignored).
+  // localStorage is only written on an explicit toggle, so a saved value
+  // always represents a deliberate user choice.
   const theme = (() => {
     if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
       return localStorage.getItem('theme');
     }
-    if (window.matchMedia('(prefers-color-scheme: light)').matches) {
-      return 'light';
-    }
-    return 'dark';
+    return 'light';
   })();
 
   if (theme === 'light') {
@@ -71,8 +70,6 @@ import "../styles/global.css";
   } else {
     document.documentElement.removeAttribute('data-theme');
   }
-
-  window.localStorage.setItem('theme', theme);
 
   document.addEventListener('DOMContentLoaded', () => {
     const themeBtns = [

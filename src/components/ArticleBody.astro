@@ -384,7 +384,7 @@ const hasVerses = Array.isArray(verses) && verses.length > 0;
             availableLanguages={availableLanguages}
           />
           {/* Verse pages may still carry a markdown body (e.g. prose
-              translations or notes) — render it below the verses. */}
+              translations or notes) - render it below the verses. */}
           <Content />
         </>
       ) : (
@@ -493,8 +493,8 @@ const hasVerses = Array.isArray(verses) && verses.length > 0;
     font-size: var(--text-sm);
   }
 
-  .reader-lang:hover,
-  .reader-lang:focus-visible {
+  .reader-lang:not(.reader-lang--active):hover,
+  .reader-lang:not(.reader-lang--active):focus-visible {
     border-color: var(--gold-400);
     color: var(--gold-400);
   }
@@ -517,7 +517,7 @@ const hasVerses = Array.isArray(verses) && verses.length > 0;
     color: var(--text-inverse);
   }
 
-  /* Translation switcher — sits centered on the parchment, above the content.
+  /* Translation switcher - sits centered on the parchment, above the content.
      The parchment is always a warm cream (independent of site theme), so this
      is styled with parchment tones rather than theme variables. */
   .reader-translate {
@@ -553,8 +553,8 @@ const hasVerses = Array.isArray(verses) && verses.length > 0;
     color: #6b4423;
   }
 
-  .reader-translate .reader-lang:hover,
-  .reader-translate .reader-lang:focus-visible {
+  .reader-translate .reader-lang:not(.reader-lang--active):hover,
+  .reader-translate .reader-lang:not(.reader-lang--active):focus-visible {
     border-color: var(--saffron-500);
     color: var(--saffron-600);
   }

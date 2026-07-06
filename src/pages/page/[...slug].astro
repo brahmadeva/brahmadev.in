@@ -32,7 +32,8 @@ const post = Astro.props;
 const { Content } = await post.render();
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
-const { titleDevanagri, titleEnglish, description, heroImage, pubDate, tags } = post.data;
+const { titleDevanagri, titleEnglish, description, heroImage, pubDate, tags } =
+  post.data;
 
 const ogSiteName = `${SITE_TITLE_DEVANAGRI} ${SITE_TITLE_SEPARATOR} ${SITE_TITLE}`;
 const postTitleEnglish = `${titleEnglish} ${SITE_TITLE_SEPARATOR} ${SITE_TITLE}`;
@@ -42,14 +43,21 @@ const postDesciptionCombined = description;
 
 const finalHeroImage = new URL(
   heroImage ? heroImage : DEFAULT_ARTICLE_IMAGE,
-  Astro.url
+  Astro.url,
 );
 
 // Build breadcrumb
-const primaryTag = tags?.find(t => Tags.includes(t));
+const primaryTag = tags?.find((t) => Tags.includes(t));
 const breadcrumbItems = [
   { label: "Home", href: "/" },
-  ...(primaryTag ? [{ label: primaryTag.charAt(0).toUpperCase() + primaryTag.slice(1), href: `/tags/${primaryTag}` }] : []),
+  ...(primaryTag
+    ? [
+        {
+          label: primaryTag.charAt(0).toUpperCase() + primaryTag.slice(1),
+          href: `/tags/${primaryTag}`,
+        },
+      ]
+    : []),
   { label: titleEnglish },
 ];
 
@@ -80,19 +88,32 @@ const infoSections = [
     titleHi: "विनियोग",
     content: post.data.viniyog,
   },
-  (post.data.sourceName || post.data.sourceDescription || post.data.sourceLink || post.data.extraInfo) && {
+  (post.data.sourceName ||
+    post.data.sourceDescription ||
+    post.data.sourceLink ||
+    post.data.extraInfo) && {
     icon: "source",
     titleEn: "Sources & References",
     titleHi: "स्रोत एवं संदर्भ",
     content: [
-      post.data.sourceName ? `<p><strong>Source:</strong> ${post.data.sourceName}</p>` : '',
-      post.data.sourceDescription ? `<p>${post.data.sourceDescription}</p>` : '',
-      post.data.sourceLink ? `<p><strong>Reference:</strong> <a href="${post.data.sourceLink}" target="_blank" rel="noopener noreferrer">${post.data.sourceLink.length > 60 ? post.data.sourceLink.substring(0, 60) + '...' : post.data.sourceLink}</a></p>` : '',
-      post.data.extraInfo ? `<p>${post.data.extraInfo}</p>` : '',
-    ].filter(Boolean).join(''),
+      post.data.sourceName
+        ? `<p><strong>Source:</strong> ${post.data.sourceName}</p>`
+        : "",
+      post.data.sourceDescription
+        ? `<p>${post.data.sourceDescription}</p>`
+        : "",
+      post.data.sourceLink
+        ? `<p><strong>Reference:</strong> <a href="${post.data.sourceLink}" target="_blank" rel="noopener noreferrer">${post.data.sourceLink.length > 60 ? post.data.sourceLink.substring(0, 60) + "..." : post.data.sourceLink}</a></p>`
+        : "",
+      post.data.extraInfo ? `<p>${post.data.extraInfo}</p>` : "",
+    ]
+      .filter(Boolean)
+      .join(""),
     open: true,
   },
-].filter((s): s is Exclude<typeof s, "" | undefined | 0 | false | null> => Boolean(s));
+].filter((s): s is Exclude<typeof s, "" | undefined | 0 | false | null> =>
+  Boolean(s),
+);
 
 const ldSchema = {
   "@context": "https://schema.org",
@@ -146,16 +167,23 @@ const ldSchema = {
     <meta property="twitter:description" content={postDesciptionCombined} />
     <meta property="twitter:image" content={finalHeroImage} />
 
-    <script type="application/ld+json" set:html={JSON.stringify(ldSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(ldSchema)} />
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
+    ></script>
 
-    <script is:inline define:vars={{ titleDevanagri, titleEnglish, description }}>
-      document.addEventListener('DOMContentLoaded', () => {
-        const downloadBtn = document.getElementById('download-pdf-btn');
+    <script
+      is:inline
+      define:vars={{ titleDevanagri, titleEnglish, description }}
+    >
+      document.addEventListener("DOMContentLoaded", () => {
+        const downloadBtn = document.getElementById("download-pdf-btn");
         if (downloadBtn) {
-          downloadBtn.addEventListener('click', async () => {
+          downloadBtn.addEventListener("click", async () => {
             const originalText = downloadBtn.innerHTML;
             downloadBtn.innerHTML = `
               <svg class="spin-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
@@ -167,17 +195,18 @@ const ldSchema = {
             downloadBtn.disabled = true;
             try {
               const { jsPDF } = window.jspdf;
-              const docBody = document.getElementById('docBody');
-              if (!docBody) throw new Error('Content not found');
+              const docBody = document.getElementById("docBody");
+              if (!docBody) throw new Error("Content not found");
 
-              const container = document.createElement('div');
-              container.id = 'pdf-export-root';
-              container.style.cssText = 'position:absolute;left:-9999px;width:800px;background:white;padding:32px 36px;font-family:"Noto Sans Devanagari","Noto Sans",sans-serif;color:#000;';
+              const container = document.createElement("div");
+              container.id = "pdf-export-root";
+              container.style.cssText =
+                'position:absolute;left:-9999px;width:800px;background:white;padding:32px 36px;font-family:"Noto Sans Devanagari","Noto Sans",sans-serif;color:#000;';
               document.body.appendChild(container);
 
               // PDF-only overrides: tighten the screen layout's generous
               // spacing and swap decorative chrome for a quieter print look.
-              const pdfStyles = document.createElement('style');
+              const pdfStyles = document.createElement("style");
               pdfStyles.textContent = `
                 #pdf-export-root #docBody p { margin-bottom: 0.9rem !important; line-height: 1.95 !important; }
                 #pdf-export-root #docBody h1, #pdf-export-root #docBody h2,
@@ -203,62 +232,85 @@ const ldSchema = {
               container.appendChild(pdfStyles);
 
               // Minimal title block: site mark, titles, short rule
-              const plainDescription = description ? description.replace(/<[^>]*>/g, '') : '';
-              const titleSection = document.createElement('div');
+              const plainDescription = description
+                ? description.replace(/<[^>]*>/g, "")
+                : "";
+              const titleSection = document.createElement("div");
               titleSection.innerHTML = `
                 <div style="text-align:center;margin-bottom:34px;">
                   <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#8b5922;margin-bottom:20px;">www.brahmadev.in</div>
-                  <h1 style="font-size:27px;font-weight:700;margin:0 0 8px;color:#1a1a1a;line-height:1.45;">${titleDevanagri || ''}</h1>
-                  <h2 style="font-size:15px;font-weight:500;margin:0;color:#555;line-height:1.5;">${titleEnglish || ''}</h2>
+                  <h1 style="font-size:27px;font-weight:700;margin:0 0 8px;color:#1a1a1a;line-height:1.45;">${titleDevanagri || ""}</h1>
+                  <h2 style="font-size:15px;font-weight:500;margin:0;color:#555;line-height:1.5;">${titleEnglish || ""}</h2>
                   <div style="height:1px;background:linear-gradient(90deg,transparent,#c9a86a,transparent);width:280px;margin:22px auto;"></div>
-                  ${plainDescription ? `<p style="font-size:13.5px;font-style:italic;line-height:1.8;color:#6f6a60;max-width:580px;margin:0 auto;">${plainDescription}</p>` : ''}
+                  ${plainDescription ? `<p style="font-size:13.5px;font-style:italic;line-height:1.8;color:#6f6a60;max-width:580px;margin:0 auto;">${plainDescription}</p>` : ""}
                 </div>
               `;
               container.appendChild(titleSection);
 
               const contentClone = docBody.cloneNode(true);
-              contentClone.style.setProperty('--reader-scale', '1');
-              const clonedElements = contentClone.querySelectorAll('*');
-              const originalElements = docBody.querySelectorAll('*');
+              contentClone.style.setProperty("--reader-scale", "1");
+              const clonedElements = contentClone.querySelectorAll("*");
+              const originalElements = docBody.querySelectorAll("*");
               clonedElements.forEach((clonedEl, index) => {
                 const originalEl = originalElements[index];
                 if (originalEl) {
                   const cs = window.getComputedStyle(originalEl);
-                  if (cs.display === 'none' || originalEl.offsetParent === null) {
+                  if (
+                    cs.display === "none" ||
+                    originalEl.offsetParent === null
+                  ) {
                     clonedEl.remove();
                     return;
                   }
                 }
-                clonedEl.style.setProperty('color', '#000000', 'important');
-                clonedEl.style.setProperty('background-color', 'transparent', 'important');
-                clonedEl.style.setProperty('opacity', '1', 'important');
-                clonedEl.style.setProperty('visibility', 'visible', 'important');
+                clonedEl.style.setProperty("color", "#000000", "important");
+                clonedEl.style.setProperty(
+                  "background-color",
+                  "transparent",
+                  "important",
+                );
+                clonedEl.style.setProperty("opacity", "1", "important");
+                clonedEl.style.setProperty(
+                  "visibility",
+                  "visible",
+                  "important",
+                );
               });
               // Strip interactive controls (script/translation toggles etc.)
-              contentClone.querySelectorAll('button, [role="toolbar"]').forEach((el) => el.remove());
+              contentClone
+                .querySelectorAll('button, [role="toolbar"]')
+                .forEach((el) => el.remove());
               container.appendChild(contentClone);
 
               await document.fonts.ready;
-              await new Promise(r => setTimeout(r, 300));
+              await new Promise((r) => setTimeout(r, 300));
 
               const canvas = await html2canvas(container, {
-                scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false, windowWidth: 800
+                scale: 2,
+                useCORS: true,
+                backgroundColor: "#ffffff",
+                logging: false,
+                windowWidth: 800,
               });
               document.body.removeChild(container);
 
               // --- Paginate onto proper A4 pages ---
-              const pageW = 210, pageH = 297;
+              const pageW = 210,
+                pageH = 297;
               const margin = { top: 14, bottom: 16, left: 14, right: 14 };
               const contentW = pageW - margin.left - margin.right;
               const pxPerMm = canvas.width / contentW;
-              const pageContentPx = Math.floor((pageH - margin.top - margin.bottom) * pxPerMm);
+              const pageContentPx = Math.floor(
+                (pageH - margin.top - margin.bottom) * pxPerMm,
+              );
 
               // Prefer cutting pages at blank rows so text lines aren't sliced.
-              const srcCtx = canvas.getContext('2d');
+              const srcCtx = canvas.getContext("2d");
               const isBlankRow = (y) => {
                 const row = srcCtx.getImageData(0, y, canvas.width, 1).data;
                 for (let i = 0; i < row.length; i += 40) {
-                  if (row[i] < 245 || row[i + 1] < 245 || row[i + 2] < 245) return false;
+                  if (row[i] < 245 || row[i + 1] < 245 || row[i + 2] < 245)
+                    return false;
                 }
                 return true;
               };
@@ -267,52 +319,85 @@ const ldSchema = {
               while (yPx < canvas.height) {
                 let end = Math.min(yPx + pageContentPx, canvas.height);
                 if (end < canvas.height) {
-                  const searchLimit = end - Math.min(400, Math.floor(pageContentPx * 0.25));
+                  const searchLimit =
+                    end - Math.min(400, Math.floor(pageContentPx * 0.25));
                   for (let k = end; k > searchLimit; k--) {
-                    if (isBlankRow(k)) { end = k; break; }
+                    if (isBlankRow(k)) {
+                      end = k;
+                      break;
+                    }
                   }
                 }
-                if (end <= yPx) end = Math.min(yPx + pageContentPx, canvas.height);
+                if (end <= yPx)
+                  end = Math.min(yPx + pageContentPx, canvas.height);
                 cuts.push([yPx, end]);
                 yPx = end;
               }
 
-              const _doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+              const _doc = new jsPDF({
+                orientation: "portrait",
+                unit: "mm",
+                format: "a4",
+              });
               _doc.setProperties({
-                title: `${titleEnglish || titleDevanagri || ''}`,
+                title: `${titleEnglish || titleDevanagri || ""}`,
                 subject: plainDescription,
-                author: 'brahmadev.in',
-                creator: 'brahmadev.in',
+                author: "brahmadev.in",
+                creator: "brahmadev.in",
               });
 
               cuts.forEach(([start, end], i) => {
                 if (i > 0) _doc.addPage();
                 const sliceH = end - start;
-                const pageCanvas = document.createElement('canvas');
+                const pageCanvas = document.createElement("canvas");
                 pageCanvas.width = canvas.width;
                 pageCanvas.height = sliceH;
-                const pctx = pageCanvas.getContext('2d');
-                pctx.fillStyle = '#ffffff';
+                const pctx = pageCanvas.getContext("2d");
+                pctx.fillStyle = "#ffffff";
                 pctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
-                pctx.drawImage(canvas, 0, start, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
-                _doc.addImage(pageCanvas.toDataURL('image/jpeg', 0.92), 'JPEG', margin.left, margin.top, contentW, sliceH / pxPerMm);
+                pctx.drawImage(
+                  canvas,
+                  0,
+                  start,
+                  canvas.width,
+                  sliceH,
+                  0,
+                  0,
+                  canvas.width,
+                  sliceH,
+                );
+                _doc.addImage(
+                  pageCanvas.toDataURL("image/jpeg", 0.92),
+                  "JPEG",
+                  margin.left,
+                  margin.top,
+                  contentW,
+                  sliceH / pxPerMm,
+                );
 
                 // Minimal footer: site left, page number right
-                _doc.setFont('helvetica', 'normal');
+                _doc.setFont("helvetica", "normal");
                 _doc.setFontSize(8);
                 _doc.setTextColor(150);
-                _doc.text('https://www.brahmadev.in', margin.left, pageH - 8);
+                _doc.text("https://www.brahmadev.in", margin.left, pageH - 8);
                 if (cuts.length > 1) {
-                  _doc.text(`${i + 1} / ${cuts.length}`, pageW - margin.right, pageH - 8, { align: 'right' });
+                  _doc.text(
+                    `${i + 1} / ${cuts.length}`,
+                    pageW - margin.right,
+                    pageH - 8,
+                    { align: "right" },
+                  );
                 }
               });
 
-              const safeTitle = (titleEnglish || titleDevanagri || 'document')
-                .replace(/[/\\?%*:|"<>]/g, '-').replace(/\s+/g, ' ').trim();
+              const safeTitle = (titleEnglish || titleDevanagri || "document")
+                .replace(/[/\\?%*:|"<>]/g, "-")
+                .replace(/\s+/g, " ")
+                .trim();
               _doc.save(`${safeTitle}.pdf`);
             } catch (error) {
-              console.error('Error generating PDF:', error);
-              alert('Failed to generate PDF: ' + error.message);
+              console.error("Error generating PDF:", error);
+              alert("Failed to generate PDF: " + error.message);
             } finally {
               downloadBtn.innerHTML = originalText;
               downloadBtn.disabled = false;
@@ -335,42 +420,89 @@ const ldSchema = {
 
           <!-- Tags -->
           <div class="content-page__tags">
-            {post.data?.tags?.map((tag: string) =>
-              Tags.includes(tag) ? (
-                <a href={`/tags/${tag}`} class="content-page__tag">
-                  {tag.charAt(0).toUpperCase() + tag.slice(1)}
-                </a>
-              ) : (
-                <span class="content-page__tag content-page__tag--plain">
-                  {tag}
-                </span>
+            {
+              post.data?.tags?.map((tag: string) =>
+                Tags.includes(tag) ? (
+                  <a href={`/tags/${tag}`} class="content-page__tag">
+                    {tag.charAt(0).toUpperCase() + tag.slice(1)}
+                  </a>
+                ) : (
+                  <span class="content-page__tag content-page__tag--plain">
+                    {tag}
+                  </span>
+                ),
               )
-            )}
+            }
           </div>
 
           <!-- Title -->
           <h1 class="content-page__title" lang="hi">{titleDevanagri}</h1>
           <p class="content-page__title-en">{titleEnglish}</p>
-          {description && (
-            <p class="content-page__description" set:html={description}></p>
-          )}
+          {
+            description && (
+              <p class="content-page__description" set:html={description} />
+            )
+          }
 
           <!-- Meta row: date + source -->
           <div class="content-page__meta">
             <span class="content-page__meta-item">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect><line x1="16" x2="16" y1="2" y2="6"></line><line x1="8" x2="8" y1="2" y2="6"></line><line x1="3" x2="21" y1="10" y2="10"></line></svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+                ><rect width="18" height="18" x="3" y="4" rx="2" ry="2"
+                ></rect><line x1="16" x2="16" y1="2" y2="6"></line><line
+                  x1="8"
+                  x2="8"
+                  y1="2"
+                  y2="6"></line><line x1="3" x2="21" y1="10" y2="10"
+                ></line></svg
+              >
               <time datetime={pubDate.toISOString()}>
-                {pubDate.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}
+                {
+                  pubDate.toLocaleDateString("en-IN", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })
+                }
               </time>
             </span>
-            {post.data.sourceName && (
-              <span class="content-page__meta-item">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"></path></svg>
-                <span set:html={post.data.sourceName} />
-              </span>
-            )}
+            {
+              post.data.sourceName && (
+                <span class="content-page__meta-item">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
+                  </svg>
+                  <span
+                    set:html={post.data.sourceName
+                      .replaceAll("<br/>", "")
+                      .replaceAll("<br />", "")
+                      .replaceAll("<br>", "")}
+                  />
+                </span>
+              )
+            }
           </div>
-
         </div>
       </div>
 
@@ -391,10 +523,7 @@ const ldSchema = {
 
         <!-- Sidebar -->
         <div class="content-page__sidebar">
-          <Sidebar
-            currentSlug={post.slug}
-            currentTags={post.data.tags || []}
-          />
+          <Sidebar currentSlug={post.slug} currentTags={post.data.tags || []} />
         </div>
       </div>
     </main>
@@ -413,7 +542,11 @@ const ldSchema = {
 
   /* Hero / Title */
   .content-page__hero {
-    background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    background: linear-gradient(
+      180deg,
+      var(--bg-primary) 0%,
+      var(--bg-secondary) 100%
+    );
     border-bottom: 1px solid var(--border-subtle);
     padding: var(--space-8) var(--space-4) var(--space-10);
   }
@@ -555,8 +688,12 @@ const ldSchema = {
   }
 
   @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {

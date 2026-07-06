@@ -21,3 +21,5 @@ pnpm-debug.log*
 .DS_Store
 
 .extra_media
+
+media/old_design/

@@ -1,5 +1,5 @@
 ---
-// Site search modal — instant, client-side fuzzy search over the prerendered
+// Site search modal - instant, client-side fuzzy search over the prerendered
 // /search-index.json (built from the page + article collections). Matches
 // across languages (Devanagari + English/transliteration) and tolerates typos
 // / partial words. Open/close + focus-trap live in MetadataHead.astro.
@@ -57,7 +57,7 @@
       <ul id="search-results" class="search-modal__results" role="listbox" aria-label="Search results" hidden></ul>
 
       <p id="search-status" class="search-modal__status" aria-live="polite">
-        Search across all texts &amp; articles — in <strong>Hindi</strong> or <strong>English</strong>.
+        Search across all texts &amp; articles - in <strong>Hindi</strong> or <strong>English</strong>.
       </p>
     </div>
 
@@ -227,7 +227,7 @@
   }
 
   /* Result rows are injected via innerHTML at runtime, so they never get
-     Astro's scoping attribute — their selectors MUST be :global(), nested under
+     Astro's scoping attribute - their selectors MUST be :global(), nested under
      the scoped .search-modal so they stay namespaced to this component. */
   .search-modal :global(.search-modal__results li) {
     margin: 0;

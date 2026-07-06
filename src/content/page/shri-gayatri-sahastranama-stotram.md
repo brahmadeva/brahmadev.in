@@ -1,15 +1,15 @@
 ---
 titleDevanagri: श्री गायत्री सहस्रनामस्तोत्रम्
 titleEnglish: Shri Gayatri Sahastranama Stotram
-description: The Gāyatrī Sahasranāma Stotram — the thousand sacred names of the Goddess Gāyatrī, the mother of the Vedas — presented here in the original Devanagari with IAST transliteration. Each name is an epithet of the Divine Mother, recited as a litany of praise, meditation, and worship.
-sourceName: ""
+description: The Gāyatrī Sahasranāma Stotram is a sacred hymn that enumerates one thousand names of the Goddess Gayatri, the mother of the Vedas. Each name is an epithet of the Divine Mother, recited as a litany of praise, meditation, and worship.
+
 sourceLink: https://sa.wikisource.org/s/bhr
-sourceDescription: ""
-extraInfo: ""
-significance: <p>The Shri Gayatri Sahasranama Stotram is a sacred hymn that enumerates one thousand names of the Goddess Gayatri, the personified essence of the Vedic Gayatri Mantra and the revered mother of the Vedas. It opens with a meditative <em>dhyana</em> verse that beholds the Devi seated upon a lotus, luminous of complexion and three-eyed, bearing the emblems of divine knowledge and mounted upon her swan.</p> <p>Each successive name unfolds a distinct facet of the Goddess — her oneness with Savitri and Saraswati, her indwelling in the Vedas, mantras and sacred syllables, and her role as the awakener of consciousness. To recite the thousand names is to contemplate her in her infinite forms and to draw upon her grace for wisdom and inner illumination.</p>
+
+significance: <p>The Shri Gayatri Sahasranama Stotram is a sacred hymn that enumerates one thousand names of the Goddess Gayatri, the personified essence of the Vedic Gayatri Mantra and the revered mother of the Vedas. It opens with a meditative <em>dhyana</em> verse that beholds the Devi seated upon a lotus, luminous of complexion and three-eyed, bearing the emblems of divine knowledge and mounted upon her swan.</p> <p>Each successive name unfolds a distinct facet of the Goddess - her oneness with Savitri and Saraswati, her indwelling in the Vedas, mantras and sacred syllables, and her role as the awakener of consciousness. To recite the thousand names is to contemplate her in her infinite forms and to draw upon her grace for wisdom and inner illumination.</p>
+
 benefits: <ul><li>Kindles spiritual illumination and awakens the higher intellect through sustained contemplation of the Divine Mother.</li><li>Purifies the mind and heart, dispelling ignorance and inner darkness.</li><li>Deepens devotion and steadies the seeker in daily <em>sandhya</em> worship and meditation.</li><li>Invokes the grace of the mother of the Vedas for clarity of speech, learning and the remembrance of sacred knowledge.</li><li>Cultivates equanimity and a serene, one-pointed mind.</li></ul>
-recitationMethod: <p>Recite the stotram after bathing and purification, ideally at dawn or during the <em>sandhya</em> hours, seated facing east before a clean space or an image of the Goddess. Begin with the <em>dhyana</em> verse, holding the Devi within the heart, and read the thousand names with unhurried attention and reverence.</p> <p>It may be offered daily or on auspicious occasions such as Fridays and the days of Navaratri. Conclude with a moment of silent gratitude, dedicating the recitation to the Goddess.</p>
-viniyog: <p>The <em>Devata</em> of this sahasranama is Gayatri, the Goddess of the sacred Vedic verse. In keeping with the Gayatri tradition, the <em>Rishi</em> is Vishvamitra and the <em>Chhanda</em> is Gayatri; the recitation is offered for the awakening of wisdom and the pursuit of dharma.</p>
+# recitationMethod: <p>Recite the stotram after bathing and purification, ideally at dawn or during the <em>sandhya</em> hours, seated facing east before a clean space or an image of the Goddess. Begin with the <em>dhyana</em> verse, holding the Devi within the heart, and read the thousand names with unhurried attention and reverence.</p> <p>It may be offered daily or on auspicious occasions such as Fridays and the days of Navaratri. Conclude with a moment of silent gratitude, dedicating the recitation to the Goddess.</p>
+# viniyog: <p>The <em>Devata</em> of this sahasranama is Gayatri, the Goddess of the sacred Vedic verse. In keeping with the Gayatri tradition, the <em>Rishi</em> is Vishvamitra and the <em>Chhanda</em> is Gayatri; the recitation is offered for the awakening of wisdom and the pursuit of dharma.</p>
 availableScripts:
   - devanagari
   - iast

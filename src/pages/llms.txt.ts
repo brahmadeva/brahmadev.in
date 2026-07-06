@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 import { getPublished } from "../utils/content";
 import { Tags, SITE_DESCRIPTION } from "../utils/consts";
 
-// llms.txt (https://llmstxt.org) — a structured, markdown overview of the site
+// llms.txt (https://llmstxt.org) - a structured, markdown overview of the site
 // for LLMs and generative-AI crawlers. Built dynamically from the content
 // collections through getPublished(), so drafts never leak here either.
 const stripHtml = (s?: string) =>
@@ -44,11 +44,11 @@ export const GET: APIRoute = async ({ site }) => {
       `- [${t.charAt(0).toUpperCase() + t.slice(1)}](${base}/tags/${t})`
   );
 
-  const body = `# Shri Brahma Dev (श्री ब्रह्मा देव) — brahmadev.in
+  const body = `# Shri Brahma Dev (श्री ब्रह्मा देव) - brahmadev.in
 
 > ${SITE_DESCRIPTION}
 
-brahmadev.in is a devotional and scholarly reference site dedicated to Lord Brahma, the Creator (Srishti-karta) of Hindu tradition, revered in the Vedas and Upanishads as Hiranyagarbha, Prajapati, and the Personified Brahman. Every text is sourced from original scriptures — the Vedas, the Puranas, the Itihasas (Ramayana and Mahabharata), and the Tantras — and cited by source, chapter, and verse.
+brahmadev.in is a devotional and scholarly reference site dedicated to Lord Brahma, the Creator (Srishti-karta) of Hindu tradition, revered in the Vedas and Upanishads as Hiranyagarbha, Prajapati, and the Personified Brahman. Every text is sourced from original scriptures - the Vedas, the Puranas, the Itihasas (Ramayana and Mahabharata), and the Tantras - and cited by source, chapter, and verse.
 
 Key facts about this site:
 

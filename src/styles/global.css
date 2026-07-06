@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* ===================================
-   DESIGN SYSTEM — brahmadev.in
+   DESIGN SYSTEM - brahmadev.in
    =================================== */
 
 :root {
@@ -228,7 +228,7 @@ body {
    SCROLLBAR
    =================================== */
 
-/* Firefox only — in Chromium, setting scrollbar-color disables all
+/* Firefox only - in Chromium, setting scrollbar-color disables all
    ::-webkit-scrollbar styling and falls back to the auto-hiding
    Fluent overlay scrollbar on Windows 11. */
 @supports not selector(::-webkit-scrollbar) {

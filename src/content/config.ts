@@ -4,14 +4,14 @@ import { defineCollection, z } from 'astro:content';
 // transliteration and translations. Devanagari (`dev`) is the only required
 // field; everything else is optional so a verse can carry as much or as little
 // as we have. Line breaks inside any field are written as real newlines and
-// rendered with `white-space: pre-line` — no <br/> markup needed.
+// rendered with `white-space: pre-line` - no <br/> markup needed.
 const verse = z.object({
-	// `verse`   — a translatable shloka / mantra / name-group (default)
-	// `speaker` — a speaker cue such as "देवा ऊचुः" (no translation expected)
-	// `colophon`— a closing/section line such as "॥ इति ... समाप्ता ॥"
-	// `heading` — an in-text section title
+	// `verse`   - a translatable shloka / mantra / name-group (default)
+	// `speaker` - a speaker cue such as "देवा ऊचुः" (no translation expected)
+	// `colophon`- a closing/section line such as "॥ इति ... समाप्ता ॥"
+	// `heading` - an in-text section title
 	role: z.enum(['verse', 'speaker', 'colophon', 'heading']).default('verse'),
-	number: z.string().optional(),           // e.g. "६८" / "1" — shown as the verse marker
+	number: z.string().optional(),           // e.g. "६८" / "1" - shown as the verse marker
 	dev: z.string(),                          // Devanagari (the original, kept intact)
 	iast: z.string().optional(),              // IAST transliteration of `dev`
 	en: z.string().optional(),                // English translation
