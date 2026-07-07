@@ -178,12 +178,22 @@ const ldSchema = {
 
     <script
       is:inline
-      define:vars={{ titleDevanagri, titleEnglish, description }}
+      define:vars={{
+        titleDevanagri,
+        titleEnglish,
+        description,
+        availableLanguages: post.data.availableLanguages || [],
+      }}
     >
       document.addEventListener("DOMContentLoaded", () => {
         const downloadBtn = document.getElementById("download-pdf-btn");
         if (downloadBtn) {
-          downloadBtn.addEventListener("click", async () => {
+          // The toolbar button only opens the export modal (see ArticleBody);
+          // generation starts here once the modal confirms the chosen
+          // script/translation. Pages without choices dispatch directly.
+          document.addEventListener("pdf-export", async (ev) => {
+            const { script = "devanagari", lang = null } =
+              (ev && ev.detail) || {};
             const originalText = downloadBtn.innerHTML;
             downloadBtn.innerHTML = `
               <svg class="spin-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
@@ -249,11 +259,23 @@ const ldSchema = {
 
               const contentClone = docBody.cloneNode(true);
               contentClone.style.setProperty("--reader-scale", "1");
+
+              // Script/translation content is filtered by the export choice
+              // below, not by what happens to be visible on screen - so keep
+              // it out of the visibility-based removal pass.
+              const isVersePage = !!docBody.querySelector(".verses");
+              const legacyLangs = isVersePage ? [] : availableLanguages;
+              const toggleSelector = [
+                ".verse__script",
+                ".verse__trans",
+                ...legacyLangs.map((l) => `.${l}-translation`),
+              ].join(", ");
+
               const clonedElements = contentClone.querySelectorAll("*");
               const originalElements = docBody.querySelectorAll("*");
               clonedElements.forEach((clonedEl, index) => {
                 const originalEl = originalElements[index];
-                if (originalEl) {
+                if (originalEl && !clonedEl.closest(toggleSelector)) {
                   const cs = window.getComputedStyle(originalEl);
                   if (
                     cs.display === "none" ||
@@ -280,6 +302,31 @@ const ldSchema = {
               contentClone
                 .querySelectorAll('button, [role="toolbar"]')
                 .forEach((el) => el.remove());
+
+              // Apply the export choice: keep only the chosen script and
+              // translation, independent of the on-screen reading state.
+              contentClone.querySelectorAll(".verse__script").forEach((el) => {
+                if (el.getAttribute("data-script") === script) el.hidden = false;
+                else el.remove();
+              });
+              contentClone.querySelectorAll(".verse__trans").forEach((el) => {
+                if (lang && el.getAttribute("data-lang") === lang)
+                  el.hidden = false;
+                else el.remove();
+              });
+              legacyLangs.forEach((l) => {
+                contentClone
+                  .querySelectorAll(`.${l}-translation`)
+                  .forEach((el) => {
+                    if (l === lang)
+                      el.style.setProperty("display", "block", "important");
+                    else el.remove();
+                  });
+              });
+              contentClone.querySelectorAll(".verse__meaning").forEach((el) => {
+                if (!el.querySelector(".verse__trans")) el.remove();
+              });
+
               container.appendChild(contentClone);
 
               await document.fonts.ready;
@@ -394,7 +441,18 @@ const ldSchema = {
                 .replace(/[/\\?%*:|"<>]/g, "-")
                 .replace(/\s+/g, " ")
                 .trim();
-              _doc.save(`${safeTitle}.pdf`);
+              // Name the file after what was exported, e.g.
+              // "Shiva Stuti (IAST, English).pdf". Script only applies to
+              // verse pages; legacy prose pages have no script choice.
+              const scriptNames = { devanagari: "Devanagari", iast: "IAST" };
+              const nameParts = [];
+              if (isVersePage) nameParts.push(scriptNames[script] || script);
+              if (lang)
+                nameParts.push(lang.charAt(0).toUpperCase() + lang.slice(1));
+              const nameSuffix = nameParts.length
+                ? ` (${nameParts.join(", ")})`
+                : "";
+              _doc.save(`${safeTitle}${nameSuffix}.pdf`);
             } catch (error) {
               console.error("Error generating PDF:", error);
               alert("Failed to generate PDF: " + error.message);

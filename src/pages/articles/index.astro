@@ -70,7 +70,7 @@ const ldSchema = {
     <meta property="og:site_name" content={ogSiteName} />
     <meta property="og:description" content={pageDescription} />
 
-    <script type="application/ld+json" set:html={JSON.stringify(ldSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(ldSchema)} />
   </head>
 
   <body>
@@ -81,12 +81,30 @@ const ldSchema = {
       <!-- Hero -->
       <div class="articles-page__hero">
         <div class="articles-page__hero-inner">
-          <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Articles" }]} />
+          <Breadcrumb
+            items={[{ label: "Home", href: "/" }, { label: "Articles" }]}
+          />
           <span class="section-label">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"></path></svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+              ><path
+                d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"
+              ></path></svg
+            >
             Articles
           </span>
-          <h1 class="articles-page__title">Scholarly <span class="highlight">Articles</span></h1>
+          <h1 class="articles-page__title">
+            Scholarly <span class="highlight">Articles</span>
+          </h1>
           <p class="articles-page__subtitle" lang="hi">विद्वत्तापूर्ण लेख</p>
           <p class="articles-page__desc">{pageDescription}</p>
         </div>
@@ -94,56 +112,68 @@ const ldSchema = {
 
       <!-- Grid -->
       <div class="articles-page__content">
-        {ordered.length > 0 ? (
-          <div class="article-grid">
-            {ordered.map((article, i) => (
-              <a
-                href={`/articles/${article.slug}/`}
-                class="article-card fade-in-on-scroll"
-                style={`--reveal-delay: ${Math.min(i, 8) * 60}ms`}
-              >
-                <div class="article-card__media">
-                  <img
-                    src={article.data.heroImage || DEFAULT_ARTICLE_IMAGE}
-                    alt=""
-                    width="400"
-                    height="225"
-                    loading="lazy"
-                    decoding="async"
-                    class="article-card__img"
-                  />
-                  {article.data.featured && (
-                    <span class="article-card__badge">Featured</span>
-                  )}
-                </div>
-                <div class="article-card__body">
-                  {article.data.category && (
-                    <span class="article-card__category">{article.data.category}</span>
-                  )}
-                  <h2 class="article-card__title">{displayTitle(article.data, article.slug)}</h2>
-                  {article.data.description && (
-                    <p class="article-card__desc">{article.data.description}</p>
-                  )}
-                </div>
-                <div class="article-card__footer">
-                  {article.data.author && (
-                    <span class="article-card__author">{article.data.author}</span>
-                  )}
-                  {article.data.pubDate && (
-                    <FormattedDate date={article.data.pubDate} />
-                  )}
-                </div>
+        {
+          ordered.length > 0 ? (
+            <div class="article-grid">
+              {ordered.map((article, i) => (
+                <a
+                  href={`/articles/${article.slug}/`}
+                  class="article-card fade-in-on-scroll"
+                  style={`--reveal-delay: ${Math.min(i, 8) * 60}ms`}
+                >
+                  <div class="article-card__media">
+                    <img
+                      src={article.data.heroImage || DEFAULT_ARTICLE_IMAGE}
+                      alt=""
+                      width="400"
+                      height="225"
+                      loading="lazy"
+                      decoding="async"
+                      class="article-card__img"
+                    />
+                    {article.data.featured && (
+                      <span class="article-card__badge">Featured</span>
+                    )}
+                  </div>
+                  <div class="article-card__body">
+                    {article.data.category && (
+                      <span class="article-card__category">
+                        {article.data.category}
+                      </span>
+                    )}
+                    <h2 class="article-card__title">
+                      {displayTitle(article.data, article.slug)}
+                    </h2>
+                    {article.data.description && (
+                      <p class="article-card__desc">
+                        {article.data.description}
+                      </p>
+                    )}
+                  </div>
+                  <div class="article-card__footer">
+                    {article.data.author && (
+                      <span class="article-card__author">
+                        {article.data.author}
+                      </span>
+                    )}
+                    {article.data.pubDate && (
+                      <FormattedDate date={article.data.pubDate} />
+                    )}
+                  </div>
+                </a>
+              ))}
+            </div>
+          ) : (
+            <div class="articles-page__empty">
+              <div class="articles-page__empty-icon">📖</div>
+              <h2 class="articles-page__empty-title">No articles yet</h2>
+              <p class="articles-page__empty-desc">Please check back soon.</p>
+              <a href="/tags" class="articles-page__empty-cta">
+                Browse Sacred Texts
               </a>
-            ))}
-          </div>
-        ) : (
-          <div class="articles-page__empty">
-            <div class="articles-page__empty-icon">📖</div>
-            <h2 class="articles-page__empty-title">No articles yet</h2>
-            <p class="articles-page__empty-desc">Scholarly articles are being prepared. Please check back soon.</p>
-            <a href="/tags" class="hero__cta-primary" style="display: inline-flex;">Browse Sacred Texts</a>
-          </div>
-        )}
+            </div>
+          )
+        }
       </div>
     </main>
 
@@ -158,7 +188,11 @@ const ldSchema = {
 
   /* Hero */
   .articles-page__hero {
-    background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    background: linear-gradient(
+      180deg,
+      var(--bg-primary) 0%,
+      var(--bg-secondary) 100%
+    );
     border-bottom: 1px solid var(--border-subtle);
     padding: var(--space-8) var(--space-4) var(--space-10);
   }
@@ -214,7 +248,10 @@ const ldSchema = {
     border-radius: var(--radius-lg);
     text-decoration: none;
     overflow: hidden;
-    transition: transform var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base);
+    transition:
+      transform var(--transition-base),
+      border-color var(--transition-base),
+      box-shadow var(--transition-base);
   }
 
   .article-card:hover {
@@ -339,6 +376,26 @@ const ldSchema = {
     font-size: var(--text-sm);
     color: var(--text-muted);
     margin-bottom: var(--space-8);
+  }
+
+  .articles-page__empty-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-8);
+    background: linear-gradient(135deg, var(--saffron-500), var(--saffron-600));
+    color: white;
+    font-weight: 700;
+    font-size: var(--text-base);
+    border-radius: var(--radius-full);
+    text-decoration: none;
+    transition: all var(--transition-base);
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+  }
+
+  .articles-page__empty-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
   }
 
   @media (min-width: 640px) {
